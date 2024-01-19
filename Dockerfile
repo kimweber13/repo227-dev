@@ -1,5 +1,5 @@
 # Build the frontend
-FROM node:lts-alpine as frontend-build
+FROM node:lts-alpine AS frontend-build
 WORKDIR /workspace/frontend
 
 COPY frontend/package.json .
@@ -9,7 +9,7 @@ COPY frontend .
 RUN npm run build
 
 # Build the API
-FROM eclipse-temurin:20-jdk-alpine as api-build
+FROM eclipse-temurin:21-jdk-alpine AS api-build
 WORKDIR /workspace/api
 
 COPY api/mvnw .
@@ -22,7 +22,7 @@ COPY --from=frontend-build /workspace/frontend/dist src/main/resources/static
 RUN ./mvnw install -DskipTests
 
 # Package everything together in a small image
-FROM eclipse-temurin:20-jdk-alpine
+FROM eclipse-temurin:21-jdk-alpine
 VOLUME /tmp
 COPY --from=api-build /workspace/api/target/*.jar app.jar
 ENTRYPOINT ["java","-jar","app.jar"]
