@@ -23,10 +23,9 @@ public class Application {
             public void addCorsMappings(@Nonnull CorsRegistry registry) {
                 // allow CORS requests for all resources and HTTP methods from the frontend origin
                 registry.addMapping("/**")
-                        .allowedMethods("OPTIONS", "HEAD", "GET", "PUT", "POST", "DELETE")
-                        // This is a workaround for proper CORS handling
-                        .allowCredentials(true)
-                        .allowedOriginPatterns("*");
+                        .allowedMethods("*")
+                        .allowedOriginPatterns("*")
+                        .allowCredentials(true);
             }
         };
     }
