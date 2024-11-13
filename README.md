@@ -80,13 +80,12 @@ If necessary, update the [API configuration file](src/main/resources/application
 
 ### API
 
-IDE: Click on the play button next to 
+IDE: Execute maven task `spring-boot:run` (available in rest-api -> Plugins -> spring-boot)
 
-Command Line: `./mvnw spring-boot:run`
+### Front end
 
-5. Now start the frontend by navigating into its folder and executing
-    - `npm install`
-    - `npm run dev`
+- `npm install`
+- `npm run dev`
 
 ## Usage
 
@@ -94,6 +93,7 @@ Assuming all prerequisites are fulfilled, you can follow these instructions to g
 
 ### Testing the backend
 
+- Open <http://localhost:8080/swagger-ui> in your browser. You can interact with all endpoints using SwaggerUI.
 - Open <http://localhost:8080/api/v1/cats> in your browser. It will show all available cats in the system.
 - Open <http://localhost:8080/api/v1/cats/1> in your browser. It will show the cat with ID `1`.
 - Open <http://localhost:8080/api/v1/cats/42> in your browser. It will show a `404 Not found` error because there is no cat with ID `42` in the system.
