@@ -24,7 +24,9 @@ public class Application {
                 // allow CORS requests for all resources and HTTP methods from the frontend origin
                 registry.addMapping("/**")
                         .allowedMethods("OPTIONS", "HEAD", "GET", "PUT", "POST", "DELETE")
-                        .allowedOrigins("http://localhost:5173");
+                        // This is a workaround for proper CORS handling
+                        .allowCredentials(true)
+                        .allowedOriginPatterns("*");
             }
         };
     }
