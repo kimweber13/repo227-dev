@@ -4,30 +4,21 @@
 > It exposes REST resources at <http://localhost:8080/api/v1/>.
 > See the list of resources in the Swagger UI (<http://localhost:8080/api/v1/swagger-ui>) or OpenAPI documentation as JSON (<http://localhost:8080/api/v1/api-docs>).
 
-## Prerequisites
+## IDE tasks
 
-### Java
+IntelliJ offers the "Maven" tool window on the right side.
 
-- [Install a JDK](https://www.oracle.com/de/java/technologies/downloads/) in at least version 21.
-- Make sure that `JAVA_HOME` is set correctly to the root directory of your JDK. You can check with this command: `echo %JAVA_HOME%` (or `echo $JAVA_HOME` on Linux / Git Bash) (or `echo $Env:JAVA_HOME` in PowerShell)
-- Make sure that the JDK `bin` folder is added to your `PATH`. You can check with this command: `echo %PATH%` (or `echo $PATH` on Linux / Git Bash) (or `echo $Env:PATH` in PowerShell)
+- Development mode: Choose rest-api -> Plugins -> spring-boot -> spring-boot:run to run and have live reload (on save).
+- Create `jar`:  Choose rest-api -> Plugins -> spring-boot -> spring-boot:re-package to create `target/rest-api.jar`.
 
-### Maven
+## Documentation
 
-- You can also install [Maven](https://maven.apache.org/) yourself, but if you use the Maven Wrapper scripts (`mvnw` or `mvnw.cmd`), this is not necessary, since Maven will be downloaded in this case
+- General references: <https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle>
+- Application properties: <https://docs.spring.io/spring-boot/docs/current/reference/html/appendix-application-properties.html>
 
-### MariaDB
+## Advanced Usage
 
-Execute `docker-compose up` in the root directory of this repository. (Background: This uses [docker-compose.yml](../docker-compose.yml)).
-
-Alternative (not recommended): Install and start a local [MariaDB server](https://mariadb.org/download/).
-If necessary, update the [API configuration file](src/main/resources/application.properties) with your database port (default is `3306`) and credentials (default is `root`:`root`).
-
-MariaDB stores its data in the subdirectory `maridadb-data`.
-
-To shut down MariaDB, execute `docker-compose down`.
-
-## Usage
+In case you installed the JDK locally, you can use the Windows Terminal / bash to execute commands:
 
 ```bash
 # build and package executable --> appears in target/rest-api.jar
@@ -53,7 +44,3 @@ java -jar ./target/rest-api.jar
 
 After you run the created JAR file, you should be able to see the implemented resources in your browser (<http://localhost:8080/api/v1/cats>).
 
-## Documentation
-
-- General references: <https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle>
-- Application properties: <https://docs.spring.io/spring-boot/docs/current/reference/html/appendix-application-properties.html>
