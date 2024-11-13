@@ -7,6 +7,7 @@
 
 1. Clone this repository.
 2. Follow the [api/README.md](/api/README.md) instructions in the `/api` folder to install the prerequisites for the backend.
+   ⚠️ DO NOT open this folder in IntelliJ. Open the sub folder! ⚠️
 3. Follow the [frontend/README.md](/frontend/README.md) instructions in the `/frontend` folder to install the prerequisites the frontend.
 4. Start the API by navigating into its folder and executing 
     - `./mvnw spring-boot:run`
