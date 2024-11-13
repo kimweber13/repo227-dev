@@ -21,7 +21,11 @@
 Execute `docker-compose up` in the root directory of this repository. (Background: This uses [docker-compose.yml](../docker-compose.yml)).
 
 Alternative (not recommended): Install and start a local [MariaDB server](https://mariadb.org/download/).
-If necessary, update the [API configuration file](src/main/resources/application.properties) with your database port (default is `3306`) and credentials (default is `root`:`root`)
+If necessary, update the [API configuration file](src/main/resources/application.properties) with your database port (default is `3306`) and credentials (default is `root`:`root`).
+
+MariaDB stores its data in the subdirectory `maridadb-data`.
+
+To shut down MariaDB, execute `docker-compose down`.
 
 ## Usage
 
