@@ -51,9 +51,9 @@ java -jar ./target/rest-api.jar
 ./mvnw spring-boot:run
 ```
 
-After you run the created JAR file, you should be able to see the implemented resources in your browser (http://localhost:8080/api/v1/cats).
+After you run the created JAR file, you should be able to see the implemented resources in your browser (<http://localhost:8080/api/v1/cats>).
 
 ## Documentation
 
-- General references: https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle
-- Application properties: https://docs.spring.io/spring-boot/docs/current/reference/html/appendix-application-properties.html
+- General references: <https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle>
+- Application properties: <https://docs.spring.io/spring-boot/docs/current/reference/html/appendix-application-properties.html>

@@ -1,6 +1,6 @@
 # frontend
 
-This is an example project for a single page application frontend with Vue.js v3. The UI is accessible under http://localhost:5173.
+This is an example project for a single page application frontend with Vue.js v3. The UI is accessible at <http://localhost:5173>.
 
 ## Prerequisites
 
@@ -9,6 +9,7 @@ Install [Node.js](https://nodejs.org/en/) and ensure that the root folder of its
 ## Development Setup
 
 There are multiple possibilities, here a few examples:
+
 - [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
 - [WebStorm](https://www.jetbrains.com/webstorm/) (brings the required plugins natively)
 - your favorite text editor + CLI
@@ -16,21 +17,25 @@ There are multiple possibilities, here a few examples:
 ## Project Setup
 
 Install the required dependencies with
+
 ```sh
 npm install
 ```
 
 Then you are good to go with
+
 ```sh
 npm run dev
 ```
 
 To deploy your code to production, you can compile and minify using
+
 ```sh
 npm run build
 ```
 
 Also, there is linter available:
+
 ```sh
 npm run lint
 ```
