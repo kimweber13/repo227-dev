@@ -1,7 +1,7 @@
 # Spring Boot RESTful API
 
 > This is an example of a Java RESTful API with Spring Boot and MariaDB.
-> It exposes REST resources under http://localhost:8080/api/v1/.
+> It exposes REST resources at <http://localhost:8080/api/v1/>.
 > See the list of resources in the Swagger UI (<http://localhost:8080/api/v1/swagger-ui>) or OpenAPI documentation as JSON (<http://localhost:8080/api/v1/api-docs>).
 
 ## Prerequisites
