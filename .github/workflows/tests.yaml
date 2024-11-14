@@ -21,3 +21,20 @@ jobs:
         run: |
           cd api
           ./mvnw --batch-mode --update-snapshots verify
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Git repository
+        uses: actions/checkout@v4
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+      - name: npm ci
+        run: |
+          cd frontend
+          npm ci
+      - name: npm run build
+        run: |
+          cd frontend
+          npm run build
