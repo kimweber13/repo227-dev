@@ -8,7 +8,7 @@ concurrency:
   group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
   cancel-in-progress: true
 jobs:
-  lint:
+  backend:
     runs-on: ubuntu-latest
     steps:
       - name: Set up Git repository
