@@ -20,7 +20,7 @@ You will see it below.
    - Open git bash\
      ![git-bash](img/git-bash.png)
    - In git bash: `cd /c/git-repositories`
-   - `git clone https://github.tik.uni-stuttgart.de/ISTE-ESE/pe2-lecture-code-examples.git`
+   - `git clone https://github.tik.uni-stuttgart.de/ISTE-ESE/rest-api-spa-example.git`
 
 3. Install Visual Studio Code.
 
