@@ -71,7 +71,7 @@ It is not needed to install [Maven](https://maven.apache.org/) - the scripts (`m
 
 1. Open Windows Terminal, PowerShell.
 2. Change directory: `cd C:\git-repositories\pe2-lecture-code-examples`
-3. Execute `docker-compose up` (Background: This uses [docker-compose.yml](docker-compose.yml)).
+3. Execute `docker compose up` (Background: This uses [docker-compose.yml](docker-compose.yml)).
 
 MariaDB stores its data in the subdirectory `maridadb-data`.
 
@@ -108,7 +108,7 @@ Assuming all prerequisites are fulfilled, you can follow these instructions to g
 
 ### MariaDB
 
-To shut down MariaDB, execute `docker-compose down`.
+To shut down MariaDB, execute `docker compose down`.
 
 ### API
 
