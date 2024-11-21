@@ -1,125 +1,76 @@
-# REST API and SPA Example Project
+# Web application for creating and managing to-do lists
 
-> This repository contains an example of a web application based on a RESTful API with Spring Boot (`api/`) and a single page application with Vue.js (`frontend/`).
-> Please refer to the `README.md` files in the respective folders for concrete instructions.
+This application is a REST API-based system for managing tasks (to-dos) and assignees.
+The application offers the possibility to create, edit and delete tasks, whereby each task can be assigned to an assignee.
+Assignees can also be created, edited and deleted. The application also offers the option of listing all tasks and assignees.
 
 ## Prerequisites
 
-Note: This tutorial is written to avoid installing JDK on your operating system.
-IntelliJ supports downloading by itself.
-Now, you need to use the Maven menu of IntelliJ.
-You will see it below.
+- Java JDK 11 or higher / Application was develloped with Java 21
+- Maven 3.9 or higher
+- IDE nach Wahl (ex. IntelliJ IDEA, Eclipse, ...)
 
-### General
+## Project Structure
 
-1. Ensure that "Windows Terminal" is running (necessary on Windows 10)
-2. Clone this repository.
+The project consists of two main components:
 
-   - Open Windows Terminal
-   - Create directory `c:\git-repositories` to collect your git checkouts: `mkdir c:\git-repositories`
-   - Open git bash\
-     ![git-bash](img/git-bash.png)
-   - In git bash: `cd /c/git-repositories`
-   - `git clone https://github.tik.uni-stuttgart.de/ISTE-ESE/rest-api-spa-example.git`
+1. ToDo Management
+2. Assignee Management
 
-3. Install Visual Studio Code.
+Each component includes controller, service, repository, and model classes.
 
-   - Enable 'Add "Open with Code" action to Windows Explorer file context menu'
+## Installation and Execution
 
-4. Install [git](https://git-scm.com/downloads/win).
+>1. Clone the repository: `git clone https://github.tik.uni-stuttgart.de/iste-pe2-2024/repo227`
 
-   - Enable "(NEW!) Add a Git Bash Profile to Windows Terminal".
-   - Choose "Use Visual Studio Code as Git's default editor".
-   - "Override the default branch name for new repositories" to "main"
-   - Choose "Use Git and optional Unix tools from the Command Prompt"
-   - Choose "Use external OpenSSH"
-   - Keep "Use the OpenSSL library"
-   - Choose "Checkout as-is, commit Unix-style line endings"
-   - Keep everything else
+>2. Navigate to the backend directory called api: `cd api`
 
-5. Install [JetBrains Toolbox App](https://www.jetbrains.com/toolbox-app/)
-6. Install "IntelliJ Ultimate" using the toolbox app.
-7. Install [docker](https://www.docker.com/products/docker-desktop/)
+>3. Run the matching docker container: `docker-compose up`
 
-### Maven
+>4. Build the project with maven: `mvn clean install`
 
-It is not needed to install [Maven](https://maven.apache.org/) - the scripts (`mvnw` or `mvnw.cmd`) automatically download it.
+>5. Run the application: `mvn spring-boot:run`
 
-## Open in IDE
+Now the application is running and available at `http://localhost:8080/api/v1` in your browser.
 
-### API
+## API REST Endpoints
 
-⚠️ DO NOT open this folder in IntelliJ. Open the sub folder! ⚠️
+### Assignee-Endpoints
 
-1. ![](img/api-dir.png)
-2. "Trust Project"
-3. Close "Install AI Assistant" (by clicking the symbol on the right)
-4. "Low memory" warning will pop up. Choose "Configure" and set the "Maximum Heap Size" to 2000. Click "Save and Restart".
-5. Add a Java JDK by: Project -> right click -> Module Settings -> SDKs -> "+" -_> "Download SDK" -> Version "21" -> Download -> wait -> "OK"
-6. Run `spring-boot:run`\
-  ![maven task spring-boot-run](img/spring-boot-run.png)
-7. A warning will appear
-8. Choose the downloaded JDK\
-   ![JDK21](img/corretto-21.png)
-9. Set language level to 21.
-10. "OK"
-11. In the "Run" window, there will be an error - because MariaDB is not started (yet).
+- List all assignees:
+>`GET /assignees`:
+- Get a specific assignee by ID:
+>`GET /assignees/{id}`:
+- Create a new assignee:
+>`POST /assignees`:
+- Update an assignee:
+>`PUT /assignees/{id}`:
+- Delete an assignee:
+>`DELETE /assignees/{id}`:
 
-## Running
 
-### MariaDB
+### ToDo-Endpoints
+- Retrieve all ToDos:
+> GET `/api/v1/todos`:
+- Retrieve a specific ToDo:
+> GET `/api/v1/todos/{id}`:
+- Create a new ToDo:
+> POST `/api/v1/todos`:
+- Update an existing ToDo:
+> PUT `/api/v1/todos/{id}`:
+- Delete a ToDo:
+> DELETE `/api/v1/todos/{id}`:
 
-1. Open Windows Terminal, PowerShell.
-2. Change directory: `cd C:\git-repositories\pe2-lecture-code-examples`
-3. Execute `docker compose up` (Background: This uses [docker-compose.yml](docker-compose.yml)).
 
-MariaDB stores its data in the subdirectory `maridadb-data`.
+### Disclaimer
 
-Alternative (not recommended): Install and start a local [MariaDB server](https://mariadb.org/download/).
-If necessary, update the [API configuration file](src/main/resources/application.properties) with your database port (default is `3306`) and credentials (default is `root`:`root`).
+- ToDo title: 1-100 characters, not empty
+- Assignee first name and last name: 1-40 characters, not empty
+- Assignee email: Must end with "uni-stuttgart.de"
 
-### API
+### Error Handling
 
-IDE: Execute maven task `spring-boot:run` (available in rest-api -> Plugins -> spring-boot)
+- 400 Bad Request: Invalid input data -> appears in POST/PUT assignees and POST/PUT todos
+- 404 Not Found: Resource not found -> appears in GET/PUT/DELETE assignees and GET/PUT/DELETE todos
+- 500 Internal Server Error: Server error -> appears in all endpoints
 
-### Front end
-
-- `npm install`
-- `npm run dev`
-
-## Usage
-
-Assuming all prerequisites are fulfilled, you can follow these instructions to get to know the application:
-
-### Testing the backend
-
-- Open <http://localhost:8080/swagger-ui> in your browser. You can interact with all endpoints using SwaggerUI.
-- Open <http://localhost:8080/api/v1/cats> in your browser. It will show all available cats in the system.
-- Open <http://localhost:8080/api/v1/cats/1> in your browser. It will show the cat with ID `1`.
-- Open <http://localhost:8080/api/v1/cats/42> in your browser. It will show a `404 Not found` error because there is no cat with ID `42` in the system.
-
-### Testing the frontend
-
-- It will host the UI at <http://localhost:5173>, which you can now also open in your browser.
-- Navigate to the cats view by clicking on the respective menu item or via the direct ULR <http://localhost:5173/#/cats>.
-- Delete a cat. Then confirm its deletion via the API by opening <http://localhost:8080/api/v1/cats> in your browser again.
-
-## Shut down
-
-### MariaDB
-
-To shut down MariaDB, execute `docker compose down`.
-
-### API
-
-- IDE: Click on the stop button
-- Command line: Press <kbd>Ctrl</kbd>+<kbd>C</kbd>
-
-## More information
-
-If you choose to install MariaDB using the installer, you need to ensure that `root` is the passwort for `root`. Otherwise, the example won't work.
-Moreover, more connections will need to be enabled (probably):
-
-![maridadb-settings](img/mariadb.png)
-
-<!-- markdownlint-disable-file MD024 MD033 MD045 -->
