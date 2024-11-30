@@ -5,6 +5,8 @@ import AssigneesView from '@/views/AssigneesView.vue';
 import ToDoView from '@/views/ToDoView.vue';
 import CreateEditAssignee from '@/views/CreateEditAssignee.vue';
 import CreateEditToDo from "@/views/CreateEditToDo.vue";
+import AssigneeByIdView from '@/views/AssigneeByIdView.vue';
+import ToDoByIdView from '@/views/ToDoByIdView.vue'; // Add this import
 
 const routes = [
   { path: '/', component: HomeView },
@@ -14,7 +16,9 @@ const routes = [
   { path: '/assignees/:id/edit', component: CreateEditAssignee },
   { path: '/todos', component: ToDoView },
   { path: '/create-todo', component: CreateEditToDo },
-  { path: '/todos/:id/edit', component: CreateEditToDo }, // Add this line for editing todos
+  { path: '/todos/:id/edit', component: CreateEditToDo },
+  { path: '/assignee-by-id', component: AssigneeByIdView },
+  { path: '/todo-by-id', component: ToDoByIdView }, // Add this new route
 ];
 
 const router = createRouter({

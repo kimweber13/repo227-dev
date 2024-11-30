@@ -48,21 +48,23 @@ onMounted(() => fetchAllAssignees());
 
 <template>
   <h1>Assignees</h1>
-  <Button @click="navigateToCreate">Create New Assignee</Button>
+  <div class="button-container">
+    <Button @click="navigateToCreate" class="create-button">Create New Assignee</Button>
+  </div>
 
   <Alert v-if="assignees.length === 0" type="warning">
     No assignees available on the server...
   </Alert>
 
-  <div v-else>
+  <div v-else class="assignee-list">
     <div class="assigneeBox" v-for="assignee in assignees" :key="assignee.id">
       <h3>{{ assignee.prename }} {{ assignee.name }}</h3>
       <p>Email: {{ assignee.email }}</p>
-      <div>
-        <Button @click="deleteAssignee(assignee.id)" mode="secondary">
+      <div class="button-group">
+        <Button @click="deleteAssignee(assignee.id)" class="delete-button">
           <FontAwesomeIcon icon="trash"/> Delete
         </Button>
-        <Button @click="editAssignee(assignee.id)" mode="primary">
+        <Button @click="editAssignee(assignee.id)" class="edit-button">
           <FontAwesomeIcon icon="edit"/> Edit
         </Button>
       </div>
@@ -71,47 +73,66 @@ onMounted(() => fetchAllAssignees());
 </template>
 
 <style scoped>
+.button-container {
+  margin-bottom: 15px;
+}
+
+.assignee-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
 .assigneeBox {
   padding: 20px;
-  margin-bottom:15px;
-
-  background-color:#4a4a4a;
-  border-radius:.5rem;
-  box-shadow:.25rem .25rem .75rem rgba(0,0,0,.1);
-
+  background-color: #4a4a4a;
+  border-radius: 0.5rem;
+  box-shadow: 0.25rem 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
 }
-.assigneeBox h3{
-  margin-top:0;
 
+.assigneeBox h3 {
+  margin-top: 0;
 }
-.assigneeBox p{
-  margin-bottom:.5rem;
 
+.assigneeBox p {
+  margin-bottom: 0.5rem;
 }
-.assigneeBox button{
-  margin-right:.5rem;
 
+.button-group {
+  display: flex;
+  gap: 0.5rem;
 }
-button{
-  background-color:#3498db;
 
-  color:white;
-
-  border-radius:.25rem;
-
-  border:none;
-
-  padding:.5rem .75rem;
-
-  transition:background-color .3s ease;
-
-  cursor:pointer;
-
-
+button {
+  color: white;
+  border-radius: 0.25rem;
+  border: none;
+  padding: 0.5rem 0.75rem;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
 }
-button:hover{
-  background-color:#2980b9;
 
+.create-button {
+  background-color: #2ecc71;
+}
 
+.create-button:hover {
+  background-color: #27ae60;
+}
+
+.delete-button {
+  background-color: #e74c3c;
+}
+
+.delete-button:hover {
+  background-color: #c0392b;
+}
+
+.edit-button {
+  background-color: #f1c40f;
+}
+
+.edit-button:hover {
+  background-color: #f39c12;
 }
 </style>

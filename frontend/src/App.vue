@@ -24,6 +24,12 @@ import "agnostic-vue/dist/index.css";
           <HeaderNavItem>
             <RouterLink to="/todos">ToDos</RouterLink>
           </HeaderNavItem>
+          <HeaderNavItem>
+            <RouterLink to="/assignee-by-id">Assignee by ID</RouterLink>
+          </HeaderNavItem>
+          <HeaderNavItem>
+            <RouterLink to="/todo-by-id">ToDo by ID</RouterLink>
+          </HeaderNavItem>
         </HeaderNav>
       </template>
     </Header>
