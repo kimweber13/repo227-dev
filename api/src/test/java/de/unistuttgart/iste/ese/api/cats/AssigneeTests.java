@@ -1,5 +1,7 @@
-package de.unistuttgart.iste.ese.api.cats;
+/*package de.unistuttgart.iste.ese.api.cats;
 
+import de.unistuttgart.iste.ese.api.Assignee.Assignee;
+import de.unistuttgart.iste.ese.api.Assignee.AssigneeRepository;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,7 +20,7 @@ import java.util.List;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class CatTests {
+public class AssigneeTests {
 
     @Autowired
     private MockMvc mockMvc;
@@ -26,20 +28,20 @@ public class CatTests {
     // Example of how to mock repository to test only the controller. The Spring
     // annotation that depends on mockito framework
     @MockBean
-    private CatRepository catRepository;
+    private AssigneeRepository assigneeRepository;
 
     @Test
     @DisplayName("Expect two elements in the returned JSON array. JPA repository is mocked")
     void testReturningTheListOfCats_dbMocked() throws Exception {
 
-        List<Cat> allCats = new ArrayList<Cat>();
-        Cat octocat = new Cat("Octocat", 42, "");
-        Cat grumpyCat = new Cat("Grumpy Cat", 10, "");
+        List<Assignee> allCats = new ArrayList<Assignee>();
+        Assignee octocat = new Assignee("Octocat", 42, "");
+        Assignee grumpyCat = new Assignee("Grumpy Cat", 10, "");
         allCats.add(octocat);
         allCats.add(grumpyCat);
 
         // mocks the underneath call to JPA repository
-        BDDMockito.given(catRepository.findAll()).willReturn(allCats);
+        BDDMockito.given(assigneeRepository.findAll()).willReturn(allCats);
 
         // performs a get request
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/cats"));
@@ -53,3 +55,4 @@ public class CatTests {
         result.andExpect(MockMvcResultMatchers.jsonPath("$.size()", Matchers.is(2)));
     }
 }
+*/

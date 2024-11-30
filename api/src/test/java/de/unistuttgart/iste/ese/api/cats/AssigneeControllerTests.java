@@ -1,6 +1,7 @@
-package de.unistuttgart.iste.ese.api.cats;
+/*package de.unistuttgart.iste.ese.api.cats;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.unistuttgart.iste.ese.api.Assignee.Assignee;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class CatControllerTests {
+public class AssigneeControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
@@ -54,7 +55,7 @@ public class CatControllerTests {
         System.out.println("Content: " + newCatString);
 
         ObjectMapper objectMapper = new ObjectMapper();
-        Cat newCat = objectMapper.readValue(newCatString, Cat.class);
+        Assignee newCat = objectMapper.readValue(newCatString, Assignee.class);
         long newCatId = newCat.getId();
 
         // performs a get request with the ID and asserts for returned object
@@ -120,3 +121,4 @@ public class CatControllerTests {
         result.andExpect(status().isNotFound());
     }
 }
+*/

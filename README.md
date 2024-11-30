@@ -8,7 +8,7 @@ Assignees can also be created, edited and deleted. The application also offers t
 
 - Java JDK 11 or higher / Application was develloped with Java 21
 - Maven 3.9 or higher
-- IDE nach Wahl (ex. IntelliJ IDEA, Eclipse, ...)
+- IDE of your choice (ex. IntelliJ IDEA, Eclipse, ...)
 
 ## Project Structure
 
