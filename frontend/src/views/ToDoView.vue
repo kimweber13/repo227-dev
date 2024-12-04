@@ -122,9 +122,9 @@ function toggleSort(field: 'title' | 'dueDate') {
     }
 }
 
-onMounted(() => {
+onMounted(async () => {
+    await fetchAssignees();
     fetchAllToDos();
-    fetchAssignees();
 });
 </script>
 
@@ -155,6 +155,7 @@ onMounted(() => {
                 <input type="checkbox" v-model="todo.finished" @change="updateToDoStatus(todo)">
                 <h3>{{ todo.title }}</h3>
             </div>
+            <p>ID: {{ todo.id }}</p>
             <p>{{ todo.description }}</p>
             <p>Due Date: {{ new Date(todo.dueDate as string).toLocaleDateString() }}</p>
             <p v-if="todo.assigneeId">Assigned to: {{ getAssigneeName(todo.assigneeId) }}</p>
@@ -180,6 +181,7 @@ onMounted(() => {
                 <input type="checkbox" v-model="todo.finished" @change="updateToDoStatus(todo)" checked>
                 <h3>{{ todo.title }}</h3>
             </div>
+            <p>ID: {{ todo.id }}</p>
             <p>{{ todo.description }}</p>
             <p>Completed Date: {{ new Date(todo.completedDate as string).toLocaleDateString() }}</p>
             <p v-if="todo.assigneeId">Assigned to: {{ getAssigneeName(todo.assigneeId) }}</p>

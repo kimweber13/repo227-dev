@@ -59,6 +59,7 @@ onMounted(() => fetchAllAssignees());
   <div v-else class="assignee-list">
     <div class="assigneeBox" v-for="assignee in assignees" :key="assignee.id">
       <h3>{{ assignee.prename }} {{ assignee.name }}</h3>
+      <p>ID: {{ assignee.id }}</p>
       <p>Email: {{ assignee.email }}</p>
       <div class="button-group">
         <Button @click="deleteAssignee(assignee.id)" class="delete-button">
