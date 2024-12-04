@@ -1,3 +1,59 @@
+<template>
+    <h1>ToDos</h1>
+    <div class="button-container">
+        <Button @click="navigateToCreate" class="create-button">Create New ToDo</Button>
+    </div>
+    <div class="filter-sort">
+        <input v-model="titleFilter" placeholder="Filter by title" />
+        <Button @click="toggleSort('title')" class="sort-button">
+            Sort by Title {{ sortBy === 'title' ? (sortOrder === 'asc' ? '↑' : '↓') : '' }}
+        </Button>
+        <Button @click="toggleSort('dueDate')" class="sort-button">
+            Sort by Due Date {{ sortBy === 'dueDate' ? (sortOrder === 'asc' ? '↑' : '↓') : '' }}
+        </Button>
+    </div>
+    <h2>Active ToDos</h2>
+    <Alert v-if="activeTodos.length === 0" type="warning">
+        No active ToDos available or match the filter...
+    </Alert>
+    <div v-else class="todo-list">
+        <div class="todoBox" v-for="todo in activeTodos" :key="todo.id">
+            <div class="todo-header">
+                <input type="checkbox" v-model="todo.finished" @change="updateToDoStatus(todo)">
+                <h3>{{ todo.title }}</h3>
+            </div>
+            <p>ID: {{ todo.id }}</p>
+            <p>{{ todo.description }}</p>
+            <p>Due Date: {{ new Date(todo.dueDate as string).toLocaleDateString() }}</p>
+            <p>Assigned to: {{ getAssigneesForTodo(todo) }}</p>
+            <div class="button-group">
+                <Button @click="editToDo(todo.id)" class="edit-button">
+                    <FontAwesomeIcon icon="edit"/> Edit
+                </Button>
+                <Button @click="deleteToDo(todo.id)" class="delete-button">
+                    <FontAwesomeIcon icon="trash"/> Delete
+                </Button>
+            </div>
+        </div>
+    </div>
+    <h2>Completed ToDos</h2>
+    <Alert v-if="completedTodos.length === 0" type="warning">
+        No completed ToDos available or match the filter...
+    </Alert>
+    <div v-else class="todo-list">
+        <div class="todoBox completed" v-for="todo in completedTodos" :key="todo.id">
+            <div class="todo-header">
+                <input type="checkbox" v-model="todo.finished" @change="updateToDoStatus(todo)" checked>
+                <h3>{{ todo.title }}</h3>
+            </div>
+            <p>ID: {{ todo.id }}</p>
+            <p>{{ todo.description }}</p>
+            <p>Completed Date: {{ new Date(todo.completedDate as string).toLocaleDateString() }}</p>
+            <p>Assigned to: {{ getAssigneesForTodo(todo) }}</p>
+        </div>
+    </div>
+</template>
+
 <script setup lang="ts">
 import { Alert, Button } from "agnostic-vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -21,13 +77,12 @@ interface ToDo {
     createdDate?: string;
     dueDate?: string;
     completedDate?: string;
-    assigneeId?: number;
+    assigneeIdList: number[];
 }
 
 const todos = ref<ToDo[]>([]);
 const assignees = ref<Assignee[]>([]);
 const router = useRouter();
-
 const titleFilter = ref('');
 const sortBy = ref('title');
 const sortOrder = ref('asc');
@@ -36,12 +91,9 @@ const filteredAndSortedTodos = computed(() => {
     let result = todos.value.filter(todo =>
         todo.title.toLowerCase().includes(titleFilter.value.toLowerCase())
     );
-
     result.sort((a, b) => {
         if (sortBy.value === 'title') {
-            return sortOrder.value === 'asc'
-                ? a.title.localeCompare(b.title)
-                : b.title.localeCompare(a.title);
+            return sortOrder.value === 'asc' ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title);
         } else if (sortBy.value === 'dueDate') {
             const dateA = new Date(a.dueDate || '').getTime();
             const dateB = new Date(b.dueDate || '').getTime();
@@ -49,7 +101,6 @@ const filteredAndSortedTodos = computed(() => {
         }
         return 0;
     });
-
     return result;
 });
 
@@ -108,9 +159,18 @@ function navigateToCreate() {
     router.push('/create-todo');
 }
 
-function getAssigneeName(assigneeId: number): string | undefined {
-    const assignee = assignees.value.find(a => a.id === assigneeId);
-    return assignee ? `${assignee.prename} ${assignee.name}` : undefined;
+function getAssigneesForTodo(todo: ToDo): string {
+    if (!todo.assigneeIdList || todo.assigneeIdList.length === 0) {
+        return "No assignees";
+    }
+
+    return todo.assigneeIdList
+        .map(id => {
+            const assignee = assignees.value.find(a => a.id === id);
+            return assignee ? `${assignee.prename} ${assignee.name}` : '';
+        })
+        .filter(name => name !== '')
+        .join(', ');
 }
 
 function toggleSort(field: 'title' | 'dueDate') {
@@ -127,67 +187,6 @@ onMounted(async () => {
     fetchAllToDos();
 });
 </script>
-
-<template>
-    <h1>ToDos</h1>
-    <div class="button-container">
-        <Button @click="navigateToCreate" class="create-button">Create New ToDo</Button>
-    </div>
-
-    <div class="filter-sort">
-        <input v-model="titleFilter" placeholder="Filter by title" />
-        <Button @click="toggleSort('title')" class="sort-button">
-            Sort by Title {{ sortBy === 'title' ? (sortOrder === 'asc' ? '↑' : '↓') : '' }}
-        </Button>
-        <Button @click="toggleSort('dueDate')" class="sort-button">
-            Sort by Due Date {{ sortBy === 'dueDate' ? (sortOrder === 'asc' ? '↑' : '↓') : '' }}
-        </Button>
-    </div>
-
-    <h2>Active ToDos</h2>
-    <Alert v-if="activeTodos.length === 0" type="warning">
-        No active ToDos available or match the filter...
-    </Alert>
-
-    <div v-else class="todo-list">
-        <div class="todoBox" v-for="todo in activeTodos" :key="todo.id">
-            <div class="todo-header">
-                <input type="checkbox" v-model="todo.finished" @change="updateToDoStatus(todo)">
-                <h3>{{ todo.title }}</h3>
-            </div>
-            <p>ID: {{ todo.id }}</p>
-            <p>{{ todo.description }}</p>
-            <p>Due Date: {{ new Date(todo.dueDate as string).toLocaleDateString() }}</p>
-            <p v-if="todo.assigneeId">Assigned to: {{ getAssigneeName(todo.assigneeId) }}</p>
-            <div class="button-group">
-                <Button @click="editToDo(todo.id)" class="edit-button">
-                    <FontAwesomeIcon icon="edit"/> Edit
-                </Button>
-                <Button @click="deleteToDo(todo.id)" class="delete-button">
-                    <FontAwesomeIcon icon="trash"/> Delete
-                </Button>
-            </div>
-        </div>
-    </div>
-
-    <h2>Completed ToDos</h2>
-    <Alert v-if="completedTodos.length === 0" type="warning">
-        No completed ToDos available or match the filter...
-    </Alert>
-
-    <div v-else class="todo-list">
-        <div class="todoBox completed" v-for="todo in completedTodos" :key="todo.id">
-            <div class="todo-header">
-                <input type="checkbox" v-model="todo.finished" @change="updateToDoStatus(todo)" checked>
-                <h3>{{ todo.title }}</h3>
-            </div>
-            <p>ID: {{ todo.id }}</p>
-            <p>{{ todo.description }}</p>
-            <p>Completed Date: {{ new Date(todo.completedDate as string).toLocaleDateString() }}</p>
-            <p v-if="todo.assigneeId">Assigned to: {{ getAssigneeName(todo.assigneeId) }}</p>
-        </div>
-    </div>
-</template>
 
 <style scoped>
 .button-container {

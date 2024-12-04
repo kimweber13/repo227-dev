@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1>{{ isEditing ? 'Edit ToDo' : 'Create ToDo' }}</h1>
+        <h1>Edit ToDo</h1>
         <form @submit.prevent="submitForm">
             <div>
                 <label for="title">Title:</label>
@@ -12,11 +12,11 @@
             </div>
             <div>
                 <label for="dueDate">Due Date:</label>
-                <input type="date" v-model="todo.dueDate" required />
+                <input type="datetime-local" v-model="dueDateInput" required />
             </div>
             <div>
-                <label for="assignee">Assignee:</label>
-                <select v-model="todo.assigneeId">
+                <label for="assignees">Assignees:</label>
+                <select v-model="todo.assigneeIdList" multiple>
                     <option v-for="assignee in assignees" :key="assignee.id" :value="assignee.id">
                         {{ assignee.prename }} {{ assignee.name }}
                     </option>
@@ -26,7 +26,7 @@
                 <label for="finished">Finished:</label>
                 <input type="checkbox" v-model="todo.finished" />
             </div>
-            <button type="submit">{{ isEditing ? 'Update' : 'Create' }}</button>
+            <button type="submit">Update</button>
         </form>
     </div>
 </template>
@@ -49,16 +49,15 @@ interface ToDo {
     title: string;
     description: string;
     finished?: boolean;
-    createdDate?: string;
-    dueDate?: string;
-    assigneeId?: number;
+    dueDate?: number; // Unix timestamp
+    assigneeIdList: number[];
 }
 
 const route = useRoute();
 const router = useRouter();
-const isEditing = ref(false);
-const todo = ref<ToDo>({ title: '', description: '', finished: false, dueDate: '' });
+const todo = ref<ToDo>({ title: '', description: '', finished: false, dueDate: Date.now(), assigneeIdList: [] });
 const assignees = ref<Assignee[]>([]);
+const dueDateInput = ref('');
 
 function fetchAssignees() {
     fetch(`${config.apiBaseUrl}/assignees`)
@@ -69,32 +68,38 @@ function fetchAssignees() {
         .catch(error => showToast(new Toast('Error', error.message, 'error', faXmark)));
 }
 
-onMounted(() => {
-    fetchAssignees();
+function fetchToDo() {
     if (route.params.id) {
-        isEditing.value = true;
         fetch(`${config.apiBaseUrl}/todos/${route.params.id}`)
             .then(response => response.json())
             .then(data => {
                 todo.value = data;
+                if (data.dueDate) {
+                    dueDateInput.value = new Date(data.dueDate).toISOString().slice(0, -1);
+                }
             })
             .catch(error => showToast(new Toast('Error', error.message, 'error', faXmark)));
     }
+}
+
+onMounted(() => {
+    fetchAssignees();
+    fetchToDo();
 });
 
 function submitForm() {
-    const method = isEditing.value ? 'PUT' : 'POST';
-    const url = isEditing.value
-        ? `${config.apiBaseUrl}/todos/${route.params.id}`
-        : `${config.apiBaseUrl}/todos`;
+    const todoToSubmit = {
+        ...todo.value,
+        dueDate: new Date(dueDateInput.value).getTime()
+    };
 
-    fetch(url, {
-        method,
+    fetch(`${config.apiBaseUrl}/todos/${route.params.id}`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(todo.value),
+        body: JSON.stringify(todoToSubmit),
     })
         .then(() => {
-            showToast(new Toast('Success', `ToDo ${isEditing.value ? 'updated' : 'created'} successfully!`, 'success', faCheck));
+            showToast(new Toast('Success', 'ToDo updated successfully!', 'success', faCheck));
             router.push('/todos');
         })
         .catch(error => showToast(new Toast('Error', error.message, 'error', faXmark)));
@@ -102,7 +107,6 @@ function submitForm() {
 </script>
 
 <style scoped>
-
 form{
     background-color: #4a4a4a;
     padding: 20px;
