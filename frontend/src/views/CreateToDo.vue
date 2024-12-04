@@ -15,12 +15,18 @@
                 <input type="datetime-local" v-model="dueDateInput" required />
             </div>
             <div>
-                <label for="assignees">Assignees:</label>
-                <select v-model="todo.assigneeIdList" multiple>
-                    <option v-for="assignee in assignees" :key="assignee.id" :value="assignee.id">
+                <label>Assignees:</label>
+                <div v-for="assignee in assignees" :key="assignee.id" style="display: flex; align-items: center;">
+                    <input
+                        type="checkbox"
+                        :id="'assignee-' + assignee.id"
+                        :value="assignee.id"
+                        v-model="todo.assigneeIdList"
+                    >
+                    <label :for="'assignee-' + assignee.id" style="margin-left: 5px;">
                         {{ assignee.prename }} {{ assignee.name }}
-                    </option>
-                </select>
+                    </label>
+                </div>
             </div>
             <button type="submit">Create</button>
         </form>
@@ -94,8 +100,7 @@ function submitForm() {
 </script>
 
 <style scoped>
-/* ... (same styles as in CreateEditToDo) ... */
-form{
+form {
     background-color: #4a4a4a;
     padding: 20px;
     border-radius: 0.5rem;
@@ -104,11 +109,11 @@ form{
     margin: auto;
 }
 
-form div{
+form div {
     margin-bottom: 0.75rem;
 }
 
-form label{
+form label {
     display: block;
     font-weight: bold;
     margin-bottom: 0.25rem;
@@ -118,7 +123,7 @@ form input[type=text],
 form input[type=email],
 form input[type=date],
 form textarea,
-form select{
+form select {
     width: 100%;
     padding: 0.5rem;
     border-radius: 0.25rem;
@@ -129,12 +134,12 @@ form input[type=text]:focus,
 form input[type=email]:focus,
 form input[type=date]:focus,
 form textarea:focus,
-form select:focus{
+form select:focus {
     outline: none;
     border-color: #3498db;
 }
 
-button[type=submit]{
+button[type=submit] {
     background-color: #3498db;
     color: white;
     border-radius: 0.25rem;
@@ -144,7 +149,7 @@ button[type=submit]{
     cursor: pointer;
 }
 
-button[type=submit]:hover{
+button[type=submit]:hover {
     background-color: #2980b9;
 }
 </style>
