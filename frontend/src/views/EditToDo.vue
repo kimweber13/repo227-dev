@@ -20,13 +20,17 @@
                     <input
                         type="checkbox"
                         :id="'assignee-' + assignee.id"
-                        :value="assignee.id"
-                        v-model="todo.assigneeIdList"
+                        :checked="todo.assigneeIdList.includes(assignee.id)"
+                        @change="toggleAssignee(assignee.id)"
                     >
                     <label :for="'assignee-' + assignee.id" style="margin-left: 5px;">
                         {{ assignee.prename }} {{ assignee.name }}
                     </label>
                 </div>
+            </div>
+            <div>
+                <label for="finished">Finished:</label>
+                <input type="checkbox" v-model="todo.finished" id="finished" />
             </div>
             <button type="submit">Update</button>
         </form>
@@ -57,7 +61,13 @@ interface ToDo {
 
 const route = useRoute();
 const router = useRouter();
-const todo = ref<ToDo>({ title: '', description: '', finished: false, dueDate: 0, assigneeIdList: [] });
+const todo = ref<ToDo>({
+    title: '',
+    description: '',
+    finished: false,
+    dueDate: Date.now(),
+    assigneeIdList: []
+});
 const assignees = ref<Assignee[]>([]);
 const dueDateInput = ref('');
 
@@ -75,7 +85,13 @@ function fetchToDo() {
         fetch(`${config.apiBaseUrl}/todos/${route.params.id}`)
             .then(response => response.json())
             .then(data => {
-                todo.value = data;
+                todo.value = {
+                    title: data.title,
+                    description: data.description,
+                    finished: data.finished || false,
+                    dueDate: data.dueDate || Date.now(),
+                    assigneeIdList: data.assigneeIdList || []
+                };
                 if (data.dueDate) {
                     dueDateInput.value = new Date(data.dueDate).toISOString().slice(0, -1);
                 }
@@ -89,9 +105,23 @@ onMounted(() => {
     fetchToDo();
 });
 
+function toggleAssignee(assigneeId: number) {
+    const index = todo.value.assigneeIdList.indexOf(assigneeId);
+    if (index === -1) {
+        // Assignee hinzufügen
+        todo.value.assigneeIdList.push(assigneeId);
+    } else {
+        // Assignee entfernen
+        todo.value.assigneeIdList.splice(index, 1);
+    }
+}
+
 function submitForm() {
     const todoToSubmit = {
-        ...todo.value,
+        title: todo.value.title,
+        description: todo.value.description,
+        finished: todo.value.finished,
+        assigneeIdList: todo.value.assigneeIdList,
         dueDate: new Date(dueDateInput.value).getTime()
     };
 
@@ -100,7 +130,13 @@ function submitForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(todoToSubmit),
     })
-        .then(() => {
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
             showToast(new Toast('Success', 'ToDo updated successfully!', 'success', faCheck));
             router.push('/todos');
         })
