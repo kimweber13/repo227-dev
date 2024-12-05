@@ -30,6 +30,9 @@ import "agnostic-vue/dist/index.css";
           <HeaderNavItem>
             <RouterLink to="/todo-by-id">ToDo by ID</RouterLink>
           </HeaderNavItem>
+          <HeaderNavItem>
+            <RouterLink to="/search-by-id">Search by ID</RouterLink>
+          </HeaderNavItem>
         </HeaderNav>
       </template>
     </Header>

@@ -8,6 +8,7 @@ import CreateToDo from "@/views/CreateToDo.vue";
 import EditToDo from "@/views/EditToDo.vue";
 import AssigneeByIdView from '@/views/AssigneeByIdView.vue';
 import ToDoByIdView from '@/views/ToDoByIdView.vue';
+import SearchByIdView from '@/views/SearchByIdView.vue';
 
 const routes = [
   { path: '/', component: HomeView },
@@ -20,6 +21,7 @@ const routes = [
   { path: '/todos/:id/edit', component: EditToDo },
   { path: '/assignee-by-id', component: AssigneeByIdView },
   { path: '/todo-by-id', component: ToDoByIdView },
+  { path: '/search-by-id', component: SearchByIdView },
 ];
 
 const router = createRouter({
