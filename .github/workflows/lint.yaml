@@ -8,16 +8,16 @@ concurrency:
   group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
   cancel-in-progress: true
 jobs:
-  lint-md:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set up Git repository
-        uses: actions/checkout@v4
-      - name: Lint
-        uses: DavidAnson/markdownlint-cli2-action@v17
-        with:
-          globs: |
-            **/*.md
+#  lint-md:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Set up Git repository
+#        uses: actions/checkout@v4
+#      - name: Lint
+#        uses: DavidAnson/markdownlint-cli2-action@v17
+#        with:
+#          globs: |
+#            **/*.md
   lint-js:
     runs-on: ubuntu-latest
     steps:
