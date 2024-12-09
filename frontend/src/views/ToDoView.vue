@@ -63,12 +63,18 @@ import { faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { onMounted, ref, computed } from "vue";
 import { useRouter } from "vue-router";
 
+/**
+ * Represents an assignee with an ID, prename, and name.
+ */
 interface Assignee {
     id: number;
     prename: string;
     name: string;
 }
 
+/**
+ * Represents a ToDo item with various properties such as ID, title, description, status, dates, and a list of assignee IDs.
+ */
 interface ToDo {
     id: number;
     title: string;
@@ -107,6 +113,11 @@ const filteredAndSortedTodos = computed(() => {
 const activeTodos = computed(() => filteredAndSortedTodos.value.filter(todo => !todo.finished));
 const completedTodos = computed(() => filteredAndSortedTodos.value.filter(todo => todo.finished));
 
+/**
+ * Fetches all ToDo items from the server.
+ * Updates the `todos` reference with the fetched data.
+ * If the fetch operation fails, shows an error toast with the error message.
+ */
 function fetchAllToDos() {
     fetch(`${config.apiBaseUrl}/todos`)
         .then(response => response.json())
@@ -116,6 +127,11 @@ function fetchAllToDos() {
         .catch(error => showToast(new Toast("Error", error.message, "error", faXmark)));
 }
 
+/**
+ * Fetches the list of assignees from the server.
+ * Updates the `assignees` reference with the fetched data.
+ * If the fetch operation fails, shows an error toast with the error message.
+ */
 function fetchAssignees() {
     fetch(`${config.apiBaseUrl}/assignees`)
         .then(response => response.json())
@@ -125,6 +141,15 @@ function fetchAssignees() {
         .catch(error => showToast(new Toast("Error", error.message, "error", faXmark)));
 }
 
+/**
+ * Updates the status of a ToDo item on the server.
+ * Sends a PUT request to update the `finished` status of the ToDo item.
+ * If the ToDo is marked as finished, sets the `completedDate` to the current date.
+ * If the ToDo is marked as unfinished, clears the `completedDate`.
+ * Shows a success toast if the update is successful, otherwise shows an error toast.
+ *
+ * @param todo - The ToDo item to update.
+ */
 function updateToDoStatus(todo: ToDo) {
     fetch(`${config.apiBaseUrl}/todos/${todo.id}`, {
         method: 'PUT',
@@ -142,6 +167,14 @@ function updateToDoStatus(todo: ToDo) {
         .catch(error => showToast(new Toast("Error", error.message, "error", faXmark)));
 }
 
+/**
+ * Deletes a ToDo item from the server.
+ * Sends a DELETE request to remove the ToDo item with the specified ID.
+ * If the deletion is successful, updates the `todos` reference to remove the deleted item.
+ * Shows a success toast if the deletion is successful, otherwise shows an error toast.
+ *
+ * @param id - The ID of the ToDo item to delete.
+ */
 function deleteToDo(id: number) {
     fetch(`${config.apiBaseUrl}/todos/${id}`, { method: "DELETE" })
         .then(() => {
@@ -151,14 +184,30 @@ function deleteToDo(id: number) {
         .catch(error => showToast(new Toast("Error", error.message, "error", faXmark)));
 }
 
+/**
+ * Navigates to the edit page for the ToDo item with the specified ID.
+ *
+ * @param id - The ID of the ToDo item to edit.
+ */
 function editToDo(id: number) {
     router.push(`/todos/${id}/edit`);
 }
 
+/**
+ * Navigates to the create page for a new ToDo item.
+ */
 function navigateToCreate() {
     router.push('/create-todo');
 }
 
+/**
+ * Retrieves the names of the assignees for a given ToDo item.
+ * If the ToDo item has no assignees, returns "No assignees".
+ * Otherwise, maps the assignee IDs to their corresponding names and joins them into a single string.
+ *
+ * @param todo - The ToDo item for which to get the assignees.
+ * @returns    - A string containing the names of the assignees, or "No assignees" if there are none.
+ */
 function getAssigneesForTodo(todo: ToDo): string {
     if (!todo.assigneeIdList || todo.assigneeIdList.length === 0) {
         return "No assignees";
@@ -173,6 +222,13 @@ function getAssigneesForTodo(todo: ToDo): string {
         .join(', ');
 }
 
+/**
+ * Toggles the sorting order for the specified field.
+ * If the current sort field is the same as the specified field, it toggles the sort order between ascending and descending.
+ * If the current sort field is different from the specified field, it sets the sort field to the specified field and the sort order to ascending.
+ *
+ * @param field - The field by which to sort the ToDo items.
+ */
 function toggleSort(field: 'title' | 'dueDate') {
     if (sortBy.value === field) {
         sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';

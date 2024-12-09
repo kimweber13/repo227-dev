@@ -44,12 +44,18 @@ import { showToast, Toast } from '@/ts/toasts';
 import config from '@/config';
 import { faCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
 
+/**
+ * Represents an assignee with an ID, prename, and name.
+ */
 interface Assignee {
     id: number;
     prename: string;
     name: string;
 }
 
+/**
+ * Represents a ToDo item with optional ID, title, description, finished status, due date, and a list of assignee IDs.
+ */
 interface ToDo {
     id?: number;
     title: string;
@@ -71,6 +77,11 @@ const todo = ref<ToDo>({
 const assignees = ref<Assignee[]>([]);
 const dueDateInput = ref('');
 
+/**
+ * Fetches the list of assignees from the server.
+ * Updates the `assignees` reference with the fetched data.
+ * Displays an error toast if the fetch operation fails.
+ */
 function fetchAssignees() {
     fetch(`${config.apiBaseUrl}/assignees`)
         .then(response => response.json())
@@ -80,6 +91,12 @@ function fetchAssignees() {
         .catch(error => showToast(new Toast('Error', error.message, 'error', faXmark)));
 }
 
+/**
+ * Fetches the ToDo item from the server based on the route parameter ID.
+ * Updates the `todo` reference with the fetched data.
+ * Sets the `dueDateInput` value if the ToDo item has a due date.
+ * Displays an error toast if the fetch operation fails.
+ */
 function fetchToDo() {
     if (route.params.id) {
         fetch(`${config.apiBaseUrl}/todos/${route.params.id}`)
@@ -105,17 +122,29 @@ onMounted(() => {
     fetchToDo();
 });
 
+/**
+ * Toggles the inclusion of an assignee in the ToDo item's assignee list.
+ * If the assignee is not in the list, they are added.
+ * If the assignee is already in the list, they are removed.
+ *
+ * @param assigneeId - The ID of the assignee to toggle.
+ */
 function toggleAssignee(assigneeId: number) {
     const index = todo.value.assigneeIdList.indexOf(assigneeId);
     if (index === -1) {
-        // Assignee hinzufügen
         todo.value.assigneeIdList.push(assigneeId);
     } else {
-        // Assignee entfernen
         todo.value.assigneeIdList.splice(index, 1);
     }
 }
 
+/**
+ * Submits the form to update an existing ToDo item.
+ * Constructs the ToDo object with the current form values and due date timestamp.
+ * Sends a PUT request to the server with the ToDo data.
+ * Displays a success toast message and navigates to the ToDo list on success.
+ * Displays an error toast message if the request fails.
+ */
 function submitForm() {
     const todoToSubmit = {
         title: todo.value.title,

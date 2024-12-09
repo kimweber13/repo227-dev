@@ -11,6 +11,10 @@ import { marked } from 'marked';
 
 const readmeContent = ref('');
 
+/**
+ * Fetches the README.md file, converts its content to HTML using the marked library,
+ * and assigns the result to the readmeContent reference.
+ */
 onMounted(async () => {
   try {
     const response = await fetch('/README.md');

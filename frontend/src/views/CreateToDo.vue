@@ -40,12 +40,18 @@ import { showToast, Toast } from '@/ts/toasts';
 import config from '@/config';
 import { faCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
 
+/**
+ * Represents an assignee with an ID, prename, and name.
+ */
 interface Assignee {
     id: number;
     prename: string;
     name: string;
 }
 
+/**
+ * Represents a ToDo item with a title, description, due date, and a list of assignee IDs.
+ */
 interface ToDo {
     title: string;
     description: string;
@@ -67,6 +73,11 @@ const dueDateTimestamp = computed(() => {
     return new Date(dueDateInput.value).getTime();
 });
 
+/**
+ * Fetches the list of assignees from the server.
+ * Updates the `assignees` reference with the fetched data.
+ * Displays an error toast if the fetch operation fails.
+ */
 function fetchAssignees() {
     fetch(`${config.apiBaseUrl}/assignees`)
         .then(response => response.json())
@@ -80,6 +91,13 @@ onMounted(() => {
     fetchAssignees();
 });
 
+/**
+ * Submits the form to create a new ToDo item.
+ * Constructs the ToDo object with the current form values and due date timestamp.
+ * Sends a POST request to the server with the ToDo data.
+ * Displays a success toast message and navigates to the ToDo list on success.
+ * Displays an error toast message if the request fails.
+ */
 function submitForm() {
     const todoToSubmit = {
         ...todo.value,

@@ -26,6 +26,9 @@ import { showToast, Toast } from '@/ts/toasts';
 import config from '@/config';
 import { faCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
 
+/**
+ * Represents an assignee with optional ID, prename, name, and email.
+ */
 interface Assignee {
     id?: number;
     prename: string;
@@ -50,6 +53,14 @@ onMounted(() => {
     }
 });
 
+/**
+ * Submits the form to create or update an assignee.
+ * Determines the HTTP method (POST for create, PUT for update) based on the `isEditing` flag.
+ * Constructs the appropriate URL for the API request.
+ * Sends the assignee data to the server.
+ * Displays a success toast message and navigates to the assignees list on success.
+ * Displays an error toast message if the request fails.
+ */
 function submitForm() {
     const method = isEditing.value ? 'PUT' : 'POST';
     const url = isEditing.value

@@ -38,12 +38,18 @@ import config from "@/config";
 import { showToast, Toast } from "@/ts/toasts";
 import { faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 
+/**
+ * Represents an assignee with an ID, prename, and name.
+ */
 interface Assignee {
     id: number;
     prename: string;
     name: string;
 }
 
+/**
+ * Represents a ToDo item with optional ID, title, description, finished status, due date, and a list of assignee IDs.
+ */
 interface ToDo {
     id: number;
     title: string;
@@ -60,6 +66,11 @@ const todo = ref<ToDo | null>(null);
 const error = ref<string | null>(null);
 const assignees = ref<Assignee[]>([]);
 
+/**
+ * Fetches the ToDo item from the server based on the `todoId` value.
+ * Updates the `todo` reference with the fetched data.
+ * Sets the `error` reference if the fetch operation fails.
+ */
 function fetchToDo() {
     if (!todoId.value) {
         error.value = "Please enter a ToDo ID";
@@ -83,6 +94,11 @@ function fetchToDo() {
         });
 }
 
+/**
+ * Deletes the current ToDo item from the server.
+ * If the deletion is successful, shows a success toast and sets the `todo` reference to null.
+ * If the deletion fails, shows an error toast with the error message.
+ */
 function deleteToDo() {
     if (!todo.value) return;
 
@@ -94,17 +110,34 @@ function deleteToDo() {
         .catch(error => showToast(new Toast("Error", error.message, "error", faXmark)));
 }
 
+/**
+ * Navigates to the edit page for the current ToDo item.
+ * If the `todo` reference is not null, it redirects to the edit page using the ToDo ID.
+ */
 function editToDo() {
     if (todo.value) {
         router.push(`/todos/${todo.value.id}/edit`);
     }
 }
 
+/**
+ * Retrieves the name of the assignee based on the provided assignee ID.
+ * Searches the `assignees` list for a matching ID and returns the full name of the assignee.
+ * If no matching assignee is found, returns 'Unknown'.
+ *
+ * @param assigneeId - The ID of the assignee to find.
+ * @returns The full name of the assignee or 'Unknown' if not found.
+ */
 function getAssigneeName(assigneeId: number): string {
     const assignee = assignees.value.find(a => a.id === assigneeId);
     return assignee ? `${assignee.prename} ${assignee.name}` : 'Unknown';
 }
 
+/**
+ * Fetches the list of assignees from the server.
+ * Updates the `assignees` reference with the fetched data.
+ * If the fetch operation fails, shows an error toast with the error message.
+ */
 function fetchAssignees() {
     fetch(`${config.apiBaseUrl}/assignees`)
         .then(response => response.json())

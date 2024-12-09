@@ -34,6 +34,9 @@ import config from "@/config";
 import { showToast, Toast } from "@/ts/toasts";
 import { faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 
+/**
+ * Interface representing an Assignee.
+ */
 interface Assignee {
     id: number;
     prename: string;
@@ -46,6 +49,11 @@ const assigneeId = ref<number | null>(null);
 const assignee = ref<Assignee | null>(null);
 const error = ref<string | null>(null);
 
+/**
+ * Fetches the assignee details based on the provided assignee ID.
+ * If the assignee is found, it updates the assignee reference.
+ * If an error occurs, it updates the error reference.
+ */
 function fetchAssignee() {
     if (!assigneeId.value) {
         error.value = "Please enter an Assignee ID";
@@ -69,6 +77,11 @@ function fetchAssignee() {
         });
 }
 
+/**
+ * Deletes the currently fetched assignee.
+ * If the deletion is successful, it shows a success toast and clears the assignee reference.
+ * If an error occurs, it shows an error toast.
+ */
 function deleteAssignee() {
     if (!assignee.value) return;
 
@@ -80,6 +93,9 @@ function deleteAssignee() {
         .catch(error => showToast(new Toast("Error", error.message, "error", faXmark)));
 }
 
+/**
+ * Navigates to the edit page for the currently fetched assignee.
+ */
 function editAssignee() {
     if (assignee.value) {
         router.push(`/assignees/${assignee.value.id}/edit`);

@@ -7,6 +7,9 @@ import { faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 
+/**
+ * Interface representing an Assignee.
+ */
 interface Assignee {
   id: number;
   prename: string;
@@ -17,6 +20,10 @@ interface Assignee {
 const assignees = ref<Assignee[]>([]);
 const router = useRouter();
 
+/**
+ * Fetches all assignees from the server and updates the `assignees` reference.
+ * If an error occurs during the fetch operation, it displays an error toast.
+ */
 function fetchAllAssignees() {
   fetch(`${config.apiBaseUrl}/assignees`)
       .then(response => response.json())
@@ -26,6 +33,15 @@ function fetchAllAssignees() {
       .catch(error => showToast(new Toast("Error", error.message, "error", faXmark)));
 }
 
+/**
+ * Deletes an assignee by their ID.
+ *
+ * Sends a DELETE request to the server to remove the assignee with the specified ID.
+ * If the deletion is successful, it updates the `assignees` reference to remove the deleted assignee
+ * and displays a success toast message. If an error occurs, it displays an error toast message.
+ *
+ * @param id - The ID of the assignee to be deleted.
+ */
 function deleteAssignee(id: number) {
   fetch(`${config.apiBaseUrl}/assignees/${id}`, { method: "DELETE" })
       .then(() => {
@@ -35,10 +51,18 @@ function deleteAssignee(id: number) {
       .catch(error => showToast(new Toast("Error", error.message, "error", faXmark)));
 }
 
+/**
+ * Navigates to the edit page for the assignee with the specified ID.
+ *
+ * @param id - The ID of the assignee to be edited.
+ */
 function editAssignee(id: number) {
   router.push(`/assignees/${id}/edit`);
 }
 
+/**
+ * Navigates to the create assignee page.
+ */
 function navigateToCreate() {
   router.push('/create-assignee');
 }
