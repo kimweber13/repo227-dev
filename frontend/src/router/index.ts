@@ -9,6 +9,7 @@ import EditToDo from "@/views/EditToDo.vue";
 import AssigneeByIdView from '@/views/AssigneeByIdView.vue';
 import ToDoByIdView from '@/views/ToDoByIdView.vue';
 import SearchByIdView from '@/views/SearchByIdView.vue';
+import ExportToDoView from '@/views/ExportToDoView.vue';
 
 const routes = [
   { path: '/', component: HomeView },
@@ -22,6 +23,7 @@ const routes = [
   { path: '/assignee-by-id', component: AssigneeByIdView },
   { path: '/todo-by-id', component: ToDoByIdView },
   { path: '/search-by-id', component: SearchByIdView },
+  { path: '/export-todos', component: ExportToDoView },
 ];
 
 const router = createRouter({

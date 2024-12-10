@@ -16,11 +16,11 @@
 
     <properties>
         <java.version>21</java.version>
-        <!-- Spring Boot 3's default version of snakeYAML is vulnerable, so we override the version -->
         <snakeyaml.version>2.1</snakeyaml.version>
     </properties>
 
     <dependencies>
+        <!-- Existing dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -60,11 +60,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
-        
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
@@ -84,6 +85,12 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- New dependency for CSV export -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.10.0</version>
+        </dependency>
     </dependencies>
 
     <build>

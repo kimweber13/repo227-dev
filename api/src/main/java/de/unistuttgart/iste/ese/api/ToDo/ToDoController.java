@@ -6,11 +6,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
+import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * REST Controller for managing ToDo entities.
- * Provides CRUD operations for ToDos.
+ * Provides CRUD operations for ToDos and CSV export functionality.
  */
 @RestController
 @ApiVersion1
@@ -39,12 +44,8 @@ public class ToDoController {
      */
     @GetMapping("/todos/{id}")
     public ResponseEntity<ToDo> getToDoById(@PathVariable Long id) {
-        try {
-            ToDo todo = toDoService.getToDoById(id);
-            return ResponseEntity.ok(todo);
-        } catch (ResourceNotFoundException ex) {
-            return ResponseEntity.notFound().build();
-        }
+        ToDo todo = toDoService.getToDoById(id);
+        return ResponseEntity.ok(todo);
     }
 
     /**
@@ -56,12 +57,8 @@ public class ToDoController {
      */
     @PostMapping("/todos")
     public ResponseEntity<ToDo> createToDo(@Valid @RequestBody ToDoDTO dto) {
-        try {
-            ToDo createdTodo = toDoService.createToDo(dto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdTodo);
-        } catch (IllegalArgumentException ex) {
-            return ResponseEntity.badRequest().body(null);
-        }
+        ToDo createdTodo = toDoService.createToDo(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdTodo);
     }
 
     /**
@@ -75,26 +72,48 @@ public class ToDoController {
      */
     @PutMapping("/todos/{id}")
     public ResponseEntity<ToDo> updateToDo(@PathVariable Long id, @Valid @RequestBody ToDoDTO dto) {
-        try {
-            ToDo updatedTodo = toDoService.updateToDo(id, dto);
-            return ResponseEntity.ok(updatedTodo);
-        } catch (ResourceNotFoundException ex) {
-            return ResponseEntity.notFound().build();
-        } catch (IllegalArgumentException ex) {
-            return ResponseEntity.badRequest().body(null);
-        }
+        ToDo updatedTodo = toDoService.updateToDo(id, dto);
+        return ResponseEntity.ok(updatedTodo);
     }
 
     /**
      * Deletes a specific ToDo by ID.
      *
      * @param id The ID of the ToDo to delete
+     * @return ResponseEntity with no content
      */
     @DeleteMapping("/todos/{id}")
-    public void deleteToDo(@PathVariable Long id) {
-
+    public ResponseEntity<Void> deleteToDo(@PathVariable Long id) {
         toDoService.deleteToDo(id);
+        return ResponseEntity.noContent().build();
+    }
 
+    /**
+     * Exports all ToDos as a CSV file.
+     *
+     * @param response HttpServletResponse to write the CSV file
+     * @throws IOException if there's an error writing the CSV
+     */
+    @GetMapping(value = "/todos/export", produces = "text/csv")
+    public void exportToCsv(HttpServletResponse response) throws IOException {
+        response.setContentType("text/csv");
+        response.setHeader("Content-Disposition", "attachment; filename=\"todos.csv\"");
+
+        List<ToDo> todos = toDoService.getAllToDos();
+
+        try (CSVPrinter csvPrinter = new CSVPrinter(response.getWriter(), CSVFormat.DEFAULT.withHeader("ID", "Title", "Description", "Status", "Created Date", "Due Date", "Completed Date", "Assignees"))) {
+            for (ToDo todo : todos) {
+                csvPrinter.printRecord(
+                    todo.getId(),
+                    todo.getTitle(),
+                    todo.getDescription(),
+                    todo.isFinished() ? "Completed" : "Active",
+                    todo.getCreatedDate(),
+                    todo.getDueDate(),
+                    String.join(", ", todo.getAssigneeList().stream().map(Object::toString).collect(Collectors.toList()))
+                );
+            }
+        }
     }
 
     /**
