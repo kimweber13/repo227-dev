@@ -2,6 +2,7 @@ package de.unistuttgart.iste.ese.api.ToDo;
 
 import de.unistuttgart.iste.ese.api.Assignee.AssigneeService;
 import de.unistuttgart.iste.ese.api.Assignee.Assignee;
+import de.unistuttgart.iste.ese.api.TodoModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,9 @@ public class ToDoService {
     @Autowired
     private AssigneeService assigneeService;
 
+    @Autowired
+    private TodoModel todoModel;
+
     /**
      * Creates a new ToDo based on the provided DTO.
      *
@@ -32,8 +36,21 @@ public class ToDoService {
         validateToDoDTO(dto);
         ToDo todo = new ToDo();
         updateToDoFromDTO(todo, dto);
+
+        // Classify the Todo title
+        String category = todoModel.predictClass(dto.getTitle());
+        todo.setCategory(category);
+
         return toDoRepository.save(todo);
     }
+
+
+    /*public ToDo createToDo(ToDoDTO dto) {
+        validateToDoDTO(dto);
+        ToDo todo = new ToDo();
+        updateToDoFromDTO(todo, dto);
+        return toDoRepository.save(todo);
+    }*/
 
     /**
      * Updates an existing ToDo based on the provided DTO.

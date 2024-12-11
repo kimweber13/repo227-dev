@@ -23,6 +23,8 @@ public class ToDoDTO {
     @NotNull(message = "Assignee list is required")
     private List<Long> assigneeIdList;
 
+    private String category;
+
     // Constructors
     /**
      * Default constructor.
@@ -130,5 +132,13 @@ public class ToDoDTO {
      */
     public void setAssigneeIdList(List<Long> assigneeIdList) {
         this.assigneeIdList = assigneeIdList;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 }

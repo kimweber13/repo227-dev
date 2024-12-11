@@ -36,6 +36,8 @@ public class ToDo {
 
     private Long finishedDate;
 
+    private String category;
+
     // Constructors
     /**
      * Default constructor for JPA.
@@ -183,4 +185,13 @@ public class ToDo {
      * @param finishedDate The finished date to set
      */
     public void setFinishedDate(Long finishedDate) { this.finishedDate = finishedDate; }
+
+    // Getter und Setter für das neue Feld
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
 }

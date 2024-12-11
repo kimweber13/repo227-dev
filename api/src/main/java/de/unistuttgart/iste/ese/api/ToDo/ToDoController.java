@@ -110,6 +110,7 @@ public class ToDoController {
                     todo.isFinished() ? "Completed" : "Active",
                     todo.getCreatedDate(),
                     todo.getDueDate(),
+                    todo.getFinishedDate(),
                     String.join(", ", todo.getAssigneeList().stream().map(Object::toString).collect(Collectors.toList()))
                 );
             }
