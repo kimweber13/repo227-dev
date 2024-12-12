@@ -12,6 +12,7 @@
             Sort by Due Date {{ sortBy === 'dueDate' ? (sortOrder === 'asc' ? '↑' : '↓') : '' }}
         </Button>
     </div>
+
     <h2>Active ToDos</h2>
     <Alert v-if="activeTodos.length === 0" type="warning">
         No active ToDos available or match the filter...
@@ -26,6 +27,7 @@
             <p>{{ todo.description }}</p>
             <p>Due Date: {{ new Date(todo.dueDate as string).toLocaleDateString() }}</p>
             <p>Assigned to: {{ getAssigneesForTodo(todo) }}</p>
+            <p>Category: {{ todo.category }}</p>
             <div class="button-group">
                 <Button @click="editToDo(todo.id)" class="edit-button">
                     <FontAwesomeIcon icon="edit"/> Edit
@@ -36,6 +38,7 @@
             </div>
         </div>
     </div>
+
     <h2>Completed ToDos</h2>
     <Alert v-if="completedTodos.length === 0" type="warning">
         No completed ToDos available or match the filter...
@@ -50,6 +53,7 @@
             <p>{{ todo.description }}</p>
             <p>Completed Date: {{ new Date(todo.completedDate as string).toLocaleDateString() }}</p>
             <p>Assigned to: {{ getAssigneesForTodo(todo) }}</p>
+            <p>Category: {{ todo.category }}</p>
         </div>
     </div>
 </template>
@@ -63,18 +67,12 @@ import { faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { onMounted, ref, computed } from "vue";
 import { useRouter } from "vue-router";
 
-/**
- * Represents an assignee with an ID, prename, and name.
- */
 interface Assignee {
     id: number;
     prename: string;
     name: string;
 }
 
-/**
- * Represents a ToDo item with various properties such as ID, title, description, status, dates, and a list of assignee IDs.
- */
 interface ToDo {
     id: number;
     title: string;
@@ -83,7 +81,8 @@ interface ToDo {
     createdDate?: string;
     dueDate?: string;
     completedDate?: string;
-    assigneeIdList: number[];
+    assigneeList: number[];
+    category: string;
 }
 
 const todos = ref<ToDo[]>([]);
@@ -97,9 +96,12 @@ const filteredAndSortedTodos = computed(() => {
     let result = todos.value.filter(todo =>
         todo.title.toLowerCase().includes(titleFilter.value.toLowerCase())
     );
+
     result.sort((a, b) => {
         if (sortBy.value === 'title') {
-            return sortOrder.value === 'asc' ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title);
+            return sortOrder.value === 'asc'
+                ? a.title.localeCompare(b.title)
+                : b.title.localeCompare(a.title);
         } else if (sortBy.value === 'dueDate') {
             const dateA = new Date(a.dueDate || '').getTime();
             const dateB = new Date(b.dueDate || '').getTime();
@@ -107,17 +109,13 @@ const filteredAndSortedTodos = computed(() => {
         }
         return 0;
     });
+
     return result;
 });
 
 const activeTodos = computed(() => filteredAndSortedTodos.value.filter(todo => !todo.finished));
 const completedTodos = computed(() => filteredAndSortedTodos.value.filter(todo => todo.finished));
 
-/**
- * Fetches all ToDo items from the server.
- * Updates the `todos` reference with the fetched data.
- * If the fetch operation fails, shows an error toast with the error message.
- */
 function fetchAllToDos() {
     fetch(`${config.apiBaseUrl}/todos`)
         .then(response => response.json())
@@ -127,11 +125,6 @@ function fetchAllToDos() {
         .catch(error => showToast(new Toast("Error", error.message, "error", faXmark)));
 }
 
-/**
- * Fetches the list of assignees from the server.
- * Updates the `assignees` reference with the fetched data.
- * If the fetch operation fails, shows an error toast with the error message.
- */
 function fetchAssignees() {
     fetch(`${config.apiBaseUrl}/assignees`)
         .then(response => response.json())
@@ -141,42 +134,46 @@ function fetchAssignees() {
         .catch(error => showToast(new Toast("Error", error.message, "error", faXmark)));
 }
 
-/**
- * Updates the status of a ToDo item on the server.
- * Sends a PUT request to update the `finished` status of the ToDo item.
- * If the ToDo is marked as finished, sets the `completedDate` to the current date.
- * If the ToDo is marked as unfinished, clears the `completedDate`.
- * Shows a success toast if the update is successful, otherwise shows an error toast.
- *
- * @param todo - The ToDo item to update.
- */
-function updateToDoStatus(todo: ToDo) {
-    fetch(`${config.apiBaseUrl}/todos/${todo.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...todo, finished: todo.finished })
-    })
-        .then(() => {
-            if (todo.finished) {
-                todo.completedDate = new Date().toISOString();
-            } else {
-                todo.completedDate = undefined;
-            }
-            showToast(new Toast("Success", `ToDo status updated!`, "success", faCheck));
-        })
-        .catch(error => showToast(new Toast("Error", error.message, "error", faXmark)));
+async function updateToDoStatus(todo: ToDo) {
+    const originalState = todo.finished;
+    try {
+        const response = await fetch(`${config.apiBaseUrl}/todos/${todo.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                ...todo,
+                finished: todo.finished,
+                completedDate: todo.finished ? new Date().toISOString() : undefined
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to update todo status');
+        }
+
+        const updatedTodo = await response.json();
+
+        // Aktualisiere das lokale Todo mit der Serverantwort
+        const index = todos.value.findIndex(t => t.id === todo.id);
+        if (index !== -1) {
+            todos.value[index] = updatedTodo;
+        }
+
+        showToast(new Toast("Success", `ToDo status updated!`, "success", faCheck));
+    } catch (error) {
+        // Setze den Status zurück, falls der Server-Request fehlschlägt
+        todo.finished = originalState;
+        showToast(new Toast("Error", "Failed to update todo status", "error", faXmark));
+    }
 }
 
-/**
- * Deletes a ToDo item from the server.
- * Sends a DELETE request to remove the ToDo item with the specified ID.
- * If the deletion is successful, updates the `todos` reference to remove the deleted item.
- * Shows a success toast if the deletion is successful, otherwise shows an error toast.
- *
- * @param id - The ID of the ToDo item to delete.
- */
+
 function deleteToDo(id: number) {
-    fetch(`${config.apiBaseUrl}/todos/${id}`, { method: "DELETE" })
+    fetch(`${config.apiBaseUrl}/todos/${id}`, {
+        method: "DELETE"
+    })
         .then(() => {
             todos.value = todos.value.filter((todo) => todo.id !== id);
             showToast(new Toast("Alert", `Successfully deleted ToDo with ID ${id}!`, "success", faCheck));
@@ -184,51 +181,30 @@ function deleteToDo(id: number) {
         .catch(error => showToast(new Toast("Error", error.message, "error", faXmark)));
 }
 
-/**
- * Navigates to the edit page for the ToDo item with the specified ID.
- *
- * @param id - The ID of the ToDo item to edit.
- */
 function editToDo(id: number) {
     router.push(`/todos/${id}/edit`);
 }
 
-/**
- * Navigates to the create page for a new ToDo item.
- */
 function navigateToCreate() {
     router.push('/create-todo');
 }
 
-/**
- * Retrieves the names of the assignees for a given ToDo item.
- * If the ToDo item has no assignees, returns "No assignees".
- * Otherwise, maps the assignee IDs to their corresponding names and joins them into a single string.
- *
- * @param todo - The ToDo item for which to get the assignees.
- * @returns    - A string containing the names of the assignees, or "No assignees" if there are none.
- */
 function getAssigneesForTodo(todo: ToDo): string {
-    if (!todo.assigneeIdList || todo.assigneeIdList.length === 0) {
+    if (!todo.assigneeList?.length) {
         return "No assignees";
     }
 
-    return todo.assigneeIdList
-        .map(id => {
-            const assignee = assignees.value.find(a => a.id === id);
-            return assignee ? `${assignee.prename} ${assignee.name}` : '';
-        })
-        .filter(name => name !== '')
-        .join(', ');
+    const assigneeNames = todo.assigneeList.reduce((names, id) => {
+        const assignee = assignees.value.find(a => a.id === id);
+        if (assignee) {
+            names.push(`${assignee.prename} ${assignee.name}`);
+        }
+        return names;
+    }, [] as string[]);
+
+    return assigneeNames.length ? assigneeNames.join(', ') : "No assignees";
 }
 
-/**
- * Toggles the sorting order for the specified field.
- * If the current sort field is the same as the specified field, it toggles the sort order between ascending and descending.
- * If the current sort field is different from the specified field, it sets the sort field to the specified field and the sort order to ascending.
- *
- * @param field - The field by which to sort the ToDo items.
- */
 function toggleSort(field: 'title' | 'dueDate') {
     if (sortBy.value === field) {
         sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';

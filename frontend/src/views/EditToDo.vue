@@ -110,7 +110,11 @@ function fetchToDo() {
                     assigneeIdList: data.assigneeIdList || []
                 };
                 if (data.dueDate) {
-                    dueDateInput.value = new Date(data.dueDate).toISOString().slice(0, -1);
+                    // Korrigierte Zeitzonenbehandlung
+                    const date = new Date(data.dueDate);
+                    const offset = date.getTimezoneOffset() * 60000;
+                    const localDate = new Date(date.getTime() - offset);
+                    dueDateInput.value = localDate.toISOString().slice(0, -1);
                 }
             })
             .catch(error => showToast(new Toast('Error', error.message, 'error', faXmark)));
@@ -146,12 +150,16 @@ function toggleAssignee(assigneeId: number) {
  * Displays an error toast message if the request fails.
  */
 function submitForm() {
+    // Korrigierte Zeitzonenbehandlung beim Submit
+    const inputDate = new Date(dueDateInput.value);
+    const offset = inputDate.getTimezoneOffset() * 60000;
+
     const todoToSubmit = {
         title: todo.value.title,
         description: todo.value.description,
         finished: todo.value.finished,
         assigneeIdList: todo.value.assigneeIdList,
-        dueDate: new Date(dueDateInput.value).getTime()
+        dueDate: inputDate.getTime() + offset // Korrektur der Zeitzone
     };
 
     fetch(`${config.apiBaseUrl}/todos/${route.params.id}`, {
