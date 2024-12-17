@@ -54,6 +54,14 @@
             <p>Completed Date: {{ new Date(todo.completedDate as string).toLocaleDateString() }}</p>
             <p>Assigned to: {{ getAssigneesForTodo(todo) }}</p>
             <p>Category: {{ todo.category }}</p>
+            <div class="button-group">
+                <Button @click="editToDo(todo.id)" class="edit-button">
+                    <FontAwesomeIcon icon="edit"/> Edit
+                </Button>
+                <Button @click="deleteToDo(todo.id)" class="delete-button">
+                    <FontAwesomeIcon icon="trash"/> Delete
+                </Button>
+            </div>
         </div>
     </div>
 </template>
@@ -80,8 +88,9 @@ interface ToDo {
     finished: boolean;
     createdDate?: string;
     dueDate?: string;
-    completedDate?: string;
-    assigneeList: number[];
+    completedDate: string | null | undefined;
+    assigneeList: Assignee[];
+    assigneeIdList: number[];
     category: string;
 }
 
@@ -135,40 +144,42 @@ function fetchAssignees() {
 }
 
 async function updateToDoStatus(todo: ToDo) {
-    const originalState = todo.finished;
+
+    const updateData = {
+        id: todo.id,
+        title: todo.title,
+        description: todo.description,
+        finished: todo.finished, // Toggle den Status
+        completedDate: !todo.finished ? new Date().toISOString() : null,
+        assigneeIdList: todo.assigneeList.map(assignee => assignee.id),
+        assigneeList: todo.assigneeList,
+        dueDate: todo.dueDate,
+        category: todo.category
+    };
+
     try {
         const response = await fetch(`${config.apiBaseUrl}/todos/${todo.id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                ...todo,
-                finished: todo.finished,
-                completedDate: todo.finished ? new Date().toISOString() : undefined
-            })
+            body: JSON.stringify(updateData),
         });
 
         if (!response.ok) {
             throw new Error('Failed to update todo status');
         }
 
-        const updatedTodo = await response.json();
+        todo.finished = todo.finished;
+        todo.completedDate = updateData.completedDate;
 
-        // Aktualisiere das lokale Todo mit der Serverantwort
-        const index = todos.value.findIndex(t => t.id === todo.id);
-        if (index !== -1) {
-            todos.value[index] = updatedTodo;
-        }
 
-        showToast(new Toast("Success", `ToDo status updated!`, "success", faCheck));
+
+
     } catch (error) {
-        // Setze den Status zurück, falls der Server-Request fehlschlägt
-        todo.finished = originalState;
         showToast(new Toast("Error", "Failed to update todo status", "error", faXmark));
     }
 }
-
 
 function deleteToDo(id: number) {
     fetch(`${config.apiBaseUrl}/todos/${id}`, {
@@ -194,15 +205,9 @@ function getAssigneesForTodo(todo: ToDo): string {
         return "No assignees";
     }
 
-    const assigneeNames = todo.assigneeList.reduce((names, id) => {
-        const assignee = assignees.value.find(a => a.id === id);
-        if (assignee) {
-            names.push(`${assignee.prename} ${assignee.name}`);
-        }
-        return names;
-    }, [] as string[]);
-
-    return assigneeNames.length ? assigneeNames.join(', ') : "No assignees";
+    return todo.assigneeList
+        .map(assignee => `${assignee.prename} ${assignee.name} `)
+        .join(", ");
 }
 
 function toggleSort(field: 'title' | 'dueDate') {
