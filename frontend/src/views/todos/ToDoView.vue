@@ -1,3 +1,117 @@
+<template>
+    <v-container fluid>
+        <v-row>
+            <!-- Linke Hälfte: Aktive ToDos -->
+            <v-col cols="12" md="6">
+                <h2 class="text-h5 mb-3">Active ToDos</h2>
+                <v-text-field
+                    v-model="titleFilter"
+                    label="Filter by title"
+                    outlined
+                    dense
+                    class="mb-4"
+                ></v-text-field>
+                <v-row>
+                    <v-col cols="6">
+                        <v-btn @click="toggleSort('title')" block>
+                            Sort by Title {{ sortBy === 'title' ? (sortOrder === 'asc' ? '↑' : '↓') : '' }}
+                        </v-btn>
+                    </v-col>
+                    <v-col cols="6">
+                        <v-btn @click="toggleSort('dueDate')" block>
+                            Sort by Due Date {{ sortBy === 'dueDate' ? (sortOrder === 'asc' ? '↑' : '↓') : '' }}
+                        </v-btn>
+                    </v-col>
+                </v-row>
+                <v-alert v-if="activeTodos.length === 0" type="warning" class="mt-4">
+                    No active ToDos available or match the filter...
+                </v-alert>
+                <v-card v-for="todo in activeTodos" :key="todo.id" class="mt-4">
+                    <v-card-title>
+                        <v-checkbox v-model="todo.finished" @change="updateToDoStatus(todo)" class="mr-2"></v-checkbox>
+                        {{ todo.title }}
+                    </v-card-title>
+                    <v-card-text>
+                        <p class="text-truncate">{{ todo.description }}</p>
+                        <p>ID: {{ todo.id }}</p>
+                        <p>Due Date: {{ new Date(todo.dueDate as string).toLocaleDateString() }}</p>
+                        <p>Assigned to: {{ getAssigneesForTodo(todo) }}</p>
+                        <p>Category: {{ todo.category }}</p>
+                    </v-card-text>
+                    <v-card-actions>
+                        <v-btn @click="editToDo(todo.id)" color="warning">
+                            <v-icon left>mdi-pencil</v-icon>
+                            Edit
+                        </v-btn>
+                        <v-btn @click="deleteToDo(todo.id)" color="error">
+                            <v-icon left>mdi-delete</v-icon>
+                            Delete
+                        </v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-col>
+
+            <!-- Rechte Hälfte: Formular zum Erstellen eines neuen ToDos und abgeschlossene ToDos -->
+            <v-col cols="12" md="6">
+                <h2 class="text-h5 mb-3">Create New ToDo</h2>
+                <v-form @submit.prevent="submitForm">
+                    <v-text-field v-model="newTodo.title" label="Title" required></v-text-field>
+                    <v-textarea v-model="newTodo.description" label="Description" required></v-textarea>
+                    <v-text-field v-model="dueDateInput" label="Due Date" type="datetime-local" required></v-text-field>
+                    <v-select
+                        v-model="newTodo.assigneeIdList"
+                        :items="assigneeItems"
+                        item-text="name"
+                        item-value="id"
+                        label="Assignees"
+                        multiple
+                        chips
+                    >
+                        <template v-slot:selection="{ item }">
+                            <v-chip>{{ item.name }}</v-chip>
+                        </template>
+                    </v-select>
+                    <v-text-field v-model="newTodo.category" label="Category"></v-text-field>
+                    <v-btn type="submit" color="primary" class="mt-4">Create ToDo</v-btn>
+                </v-form>
+
+                <h2 class="text-h5 mb-3 mt-6">Completed ToDos</h2>
+                <v-alert v-if="completedTodos.length === 0" type="warning" class="mb-4">
+                    No completed ToDos available or match the filter...
+                </v-alert>
+                <v-row v-else>
+                    <v-col v-for="todo in completedTodos" :key="todo.id" cols="12" sm="6" md="4">
+                        <v-card class="completed">
+                            <v-card-title>
+                                <v-checkbox v-model="todo.finished" @change="updateToDoStatus(todo)" class="mr-2"></v-checkbox>
+                                {{ todo.title }}
+                            </v-card-title>
+                            <v-card-text>
+                                <p>ID: {{ todo.id }}</p>
+                                <p>{{ todo.description }}</p>
+                                <p>Completed Date: {{ new Date(todo.completedDate as string).toLocaleDateString() }}</p>
+                                <p>Assigned to: {{ getAssigneesForTodo(todo) }}</p>
+                                <p>Category: {{ todo.category }}</p>
+                            </v-card-text>
+                            <v-card-actions>
+                                <v-btn @click="editToDo(todo.id)" color="warning">
+                                    <v-icon left>mdi-pencil</v-icon>
+                                    Edit
+                                </v-btn>
+                                <v-btn @click="deleteToDo(todo.id)" color="error">
+                                    <v-icon left>mdi-delete</v-icon>
+                                    Delete
+                                </v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-col>
+                </v-row>
+            </v-col>
+        </v-row>
+    </v-container>
+</template>
+
+
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
@@ -30,8 +144,15 @@ const router = useRouter();
 const titleFilter = ref('');
 const sortBy = ref('title');
 const sortOrder = ref('asc');
-const searchId = ref('');
-const searchedTodo = ref<ToDo | null>(null);
+
+const newTodo = ref({
+    title: '',
+    description: '',
+    assigneeIdList: [] as number[],
+    dueDate: 0,
+    category: ''
+});
+const dueDateInput = ref('');
 
 const filteredAndSortedTodos = computed(() => {
     let result = todos.value.filter(todo => todo.title.toLowerCase().includes(titleFilter.value.toLowerCase()));
@@ -50,6 +171,13 @@ const filteredAndSortedTodos = computed(() => {
 
 const activeTodos = computed(() => filteredAndSortedTodos.value.filter(todo => !todo.finished));
 const completedTodos = computed(() => filteredAndSortedTodos.value.filter(todo => todo.finished));
+
+const assigneeItems = computed(() => {
+    return assignees.value.map(assignee => ({
+        id: assignee.id,
+        name: `${assignee.prename} ${assignee.name}`
+    }));
+});
 
 function fetchAllToDos() {
     fetch(`${config.apiBaseUrl}/todos`)
@@ -134,29 +262,26 @@ function toggleSort(field: 'title' | 'dueDate') {
     }
 }
 
-function searchToDoById() {
-    if (!searchId.value) {
-        showToast(new Toast("Error", "Please enter a ToDo ID", "error", faXmark));
-        return;
-    }
+function submitForm() {
+    const todoToSubmit = {
+        ...newTodo.value,
+        dueDate: new Date(dueDateInput.value).getTime(),
+        finished: false
+    };
 
-    fetch(`${config.apiBaseUrl}/todos/${searchId.value}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("ToDo not found");
-            }
-            return response.json();
-        })
+    fetch(`${config.apiBaseUrl}/todos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(todoToSubmit),
+    })
+        .then(response => response.json())
         .then(data => {
-            searchedTodo.value = data;
-            todos.value = [data];
-            showToast(new Toast("Success", "ToDo found", "success", faCheck));
+            todos.value.push(data);
+            showToast(new Toast('Success', 'ToDo created successfully!', 'success', faCheck));
+            newTodo.value = { title: '', description: '', assigneeIdList: [], dueDate: 0, category: '' };
+            dueDateInput.value = '';
         })
-        .catch(err => {
-            showToast(new Toast("Error", err.message, "error", faXmark));
-            searchedTodo.value = null;
-            todos.value = [];
-        });
+        .catch(error => showToast(new Toast('Error', error.message, 'error', faXmark)));
 }
 
 onMounted(async () => {
@@ -165,108 +290,7 @@ onMounted(async () => {
 });
 </script>
 
-<template>
-    <v-container>
-        <v-row align="center" class="mb-4">
-            <v-spacer></v-spacer>
-            <v-col cols="12" sm="4" class="text-right">
-                <v-btn color="primary" @click="navigateToCreate">
-                    Create New ToDo
-                </v-btn>
-            </v-col>
-        </v-row>
-
-        <v-row class="mb-4">
-            <v-col cols="12" sm="6">
-                <v-text-field
-                    v-model="titleFilter"
-                    label="Filter by title"
-                    outlined
-                    dense
-                ></v-text-field>
-            </v-col>
-            <v-col cols="12" sm="3">
-                <v-btn @click="toggleSort('title')" block height="56">
-                    Sort by Title {{ sortBy === 'title' ? (sortOrder === 'asc' ? '↑' : '↓') : '' }}
-                </v-btn>
-            </v-col>
-            <v-col cols="12" sm="3">
-                <v-btn @click="toggleSort('dueDate')" block height="56">
-                    Sort by Due Date {{ sortBy === 'dueDate' ? (sortOrder === 'asc' ? '↑' : '↓') : '' }}
-                </v-btn>
-            </v-col>
-        </v-row>
-
-        <h2 class="text-h5 mb-3">Active ToDos</h2>
-        <v-alert v-if="activeTodos.length === 0" type="warning" class="mb-4">
-            No active ToDos available or match the filter...
-        </v-alert>
-        <v-row v-else>
-            <v-col v-for="todo in activeTodos" :key="todo.id" cols="12" sm="6" md="4">
-                <v-card>
-                    <v-card-title>
-                        <v-checkbox v-model="todo.finished" @change="updateToDoStatus(todo)" class="mr-2"></v-checkbox>
-                        {{ todo.title }}
-                    </v-card-title>
-                    <v-card-text>
-                        <p class="text-truncate">{{ todo.description }}</p>
-                        <p>ID: {{ todo.id }}</p>
-                        <p>Due Date: {{ new Date(todo.dueDate as string).toLocaleDateString() }}</p>
-                        <p>Assigned to: {{ getAssigneesForTodo(todo) }}</p>
-                        <p>Category: {{ todo.category }}</p>
-                    </v-card-text>
-                    <v-card-actions>
-                        <v-btn @click="editToDo(todo.id)" color="warning">
-                            <v-icon left>mdi-pencil</v-icon>
-                            Edit
-                        </v-btn>
-                        <v-btn @click="deleteToDo(todo.id)" color="error">
-                            <v-icon left>mdi-delete</v-icon>
-                            Delete
-                        </v-btn>
-                    </v-card-actions>
-                </v-card>
-            </v-col>
-        </v-row>
-
-        <h2 class="text-h5 mb-3 mt-6">Completed ToDos</h2>
-        <v-alert v-if="completedTodos.length === 0" type="warning" class="mb-4">
-            No completed ToDos available or match the filter...
-        </v-alert>
-        <v-row v-else>
-            <v-col v-for="todo in completedTodos" :key="todo.id" cols="12" sm="6" md="4">
-                <v-card class="completed">
-                    <v-card-title>
-                        <v-checkbox v-model="todo.finished" @change="updateToDoStatus(todo)" class="mr-2"></v-checkbox>
-                        {{ todo.title }}
-                    </v-card-title>
-                    <v-card-text>
-                        <p class="text-truncate">{{ todo.description }}</p>
-                        <p>ID: {{ todo.id }}</p>
-                        <p>Completed Date: {{ new Date(todo.completedDate as string).toLocaleDateString() }}</p>
-                        <p>Assigned to: {{ getAssigneesForTodo(todo) }}</p>
-                        <p>Category: {{ todo.category }}</p>
-                    </v-card-text>
-                    <v-card-actions>
-                        <v-btn @click="editToDo(todo.id)" color="warning">
-                            <v-icon left>mdi-pencil</v-icon>
-                            Edit
-                        </v-btn>
-                        <v-btn @click="deleteToDo(todo.id)" color="error">
-                            <v-icon left>mdi-delete</v-icon>
-                            Delete
-                        </v-btn>
-                    </v-card-actions>
-                </v-card>
-            </v-col>
-        </v-row>
-    </v-container>
-</template>
-
 <style scoped>
-.completed {
-    opacity: 0.7;
-}
 .text-truncate {
     white-space: nowrap;
     overflow: hidden;

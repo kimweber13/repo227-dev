@@ -13,6 +13,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
 /**
  * REST Controller for managing ToDo entities.
  * Provides CRUD operations for ToDos and CSV export functionality.
@@ -88,33 +93,39 @@ public class ToDoController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Exports all ToDos as a CSV file.
-     *
-     * @param response HttpServletResponse to write the CSV file
-     * @throws IOException if there's an error writing the CSV
-     */
     @GetMapping(value = "/todos/export", produces = "text/csv")
     public void exportToCsv(HttpServletResponse response) throws IOException {
         response.setContentType("text/csv");
         response.setHeader("Content-Disposition", "attachment; filename=\"todos.csv\"");
 
         List<ToDo> todos = toDoService.getAllToDos();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        try (CSVPrinter csvPrinter = new CSVPrinter(response.getWriter(), CSVFormat.DEFAULT.withHeader("ID", "Title", "Description", "Status", "Created Date", "Due Date", "Completed Date", "Assignees"))) {
+        try (CSVPrinter csvPrinter = new CSVPrinter(response.getWriter(), CSVFormat.DEFAULT.withHeader("id", "title", "description", "finished", "assignees", "createdDate", "dueDate", "finishedDate", "category"))) {
             for (ToDo todo : todos) {
                 csvPrinter.printRecord(
                     todo.getId(),
                     todo.getTitle(),
                     todo.getDescription(),
                     todo.isFinished() ? "Completed" : "Active",
-                    todo.getCreatedDate(),
-                    todo.getDueDate(),
-                    todo.getFinishedDate(),
-                    String.join(", ", todo.getAssigneeList().stream().map(Object::toString).collect(Collectors.toList()))
+                    String.join(", ", todo.getAssigneeList().stream()
+                        .map(assignee -> assignee.getPrename() + " " + assignee.getName())
+                        .collect(Collectors.toList())),
+                    formatDate(todo.getCreatedDate(), formatter),
+                    formatDate(todo.getDueDate(), formatter),
+                    formatDate(todo.getFinishedDate(), formatter),
+                    todo.getCategory()
                 );
             }
         }
+    }
+
+
+    private String formatDate(Long timestamp, DateTimeFormatter formatter) {
+        if (timestamp == null) {
+            return "";
+        }
+        return LocalDate.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault()).format(formatter);
     }
 
     /**
