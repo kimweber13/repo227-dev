@@ -1,13 +1,13 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import HomeView from '../views/HomeView.vue';
 import AboutView from '@/views/AboutView.vue';
-import AssigneesView from '@/views/AssigneesView.vue';
-import ToDoView from '@/views/ToDoView.vue';
-import CreateEditAssignee from '@/views/CreateEditAssignee.vue';
-import CreateToDo from "@/views/CreateToDo.vue";
-import EditToDo from "@/views/EditToDo.vue";
-import AssigneeByIdView from '@/views/AssigneeByIdView.vue';
-import ToDoByIdView from '@/views/ToDoByIdView.vue';
+import AssigneesView from '@/views/assignees/AssigneesView.vue';
+import ToDoView from '@/views/todos/ToDoView.vue';
+import CreateEditAssignee from '@/views/assignees/CreateEditAssignee.vue';
+import CreateToDo from "@/views/todos/CreateToDo.vue";
+import EditToDo from "@/views/todos/EditToDo.vue";
+import AssigneeByIdView from '@/views/assignees/AssigneeByIdView.vue';
+import ToDoByIdView from '@/views/todos/ToDoByIdView.vue';
 import SearchByIdView from '@/views/SearchByIdView.vue';
 import ExportToDoView from '@/views/ExportToDoView.vue';
 
