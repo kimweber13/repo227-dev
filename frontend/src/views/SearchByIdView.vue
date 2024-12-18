@@ -1,56 +1,77 @@
 <template>
-    <div>
-        <h1>Search by ID</h1>
-        <div class="tab-container">
-            <button @click="activeTab = 'assignee'" :class="{ active: activeTab === 'assignee' }">Assignee</button>
-            <button @click="activeTab = 'todo'" :class="{ active: activeTab === 'todo' }">ToDo</button>
-        </div>
-        <div class="input-container">
-            <input type="number" v-model="searchId" :placeholder="`Enter ${activeTab === 'assignee' ? 'Assignee' : 'ToDo'} ID`" />
-            <Button @click="fetchItem" class="fetch-button">Fetch {{ activeTab === 'assignee' ? 'Assignee' : 'ToDo' }}</Button>
-        </div>
+    <v-container>
+        <h1 class="text-h4 mb-4">Search by ID</h1>
+        <v-tabs v-model="activeTab" class="mb-4">
+            <v-tab value="assignee">Assignee</v-tab>
+            <v-tab value="todo">ToDo</v-tab>
+        </v-tabs>
+        <v-row class="mb-4">
+            <v-col cols="12" sm="8">
+                <v-text-field
+                    v-model="searchId"
+                    :label="`Enter ${activeTab === 'assignee' ? 'Assignee' : 'ToDo'} ID`"
+                    type="number"
+                    outlined
+                    dense
+                ></v-text-field>
+            </v-col>
+            <v-col cols="12" sm="4">
+                <v-btn @click="fetchItem" color="primary" block height="56">
+                    Fetch {{ activeTab === 'assignee' ? 'Assignee' : 'ToDo' }}
+                </v-btn>
+            </v-col>
+        </v-row>
 
-        <Alert v-if="error" type="error">
+        <v-alert v-if="error" type="error" class="mb-4">
             {{ error }}
-        </Alert>
+        </v-alert>
 
-        <div v-if="assignee && activeTab === 'assignee'" class="itemBox">
-            <h3>{{ assignee.prename }} {{ assignee.name }}</h3>
-            <p>Email: {{ assignee.email }}</p>
-            <div class="button-group">
-                <Button @click="deleteItem" class="delete-button">
-                    <FontAwesomeIcon icon="trash"/> Delete
-                </Button>
-                <Button @click="editItem" class="edit-button">
-                    <FontAwesomeIcon icon="edit"/> Edit
-                </Button>
-            </div>
-        </div>
+        <v-card v-if="assignee && activeTab === 'assignee'" class="mb-4">
+            <v-card-title>{{ assignee.prename }} {{ assignee.name }}</v-card-title>
+            <v-card-text>
+                <p>Email: {{ assignee.email }}</p>
+            </v-card-text>
+            <v-card-actions>
+                <v-btn @click="deleteItem" color="error">
+                    <v-icon left>mdi-delete</v-icon>
+                    Delete
+                </v-btn>
+                <v-btn @click="editItem" color="warning">
+                    <v-icon left>mdi-pencil</v-icon>
+                    Edit
+                </v-btn>
+            </v-card-actions>
+        </v-card>
 
-        <div v-if="todo && activeTab === 'todo'" class="itemBox">
-            <h3>{{ todo.title }}</h3>
-            <p>Description: {{ todo.description }}</p>
-            <p>Status: {{ todo.finished ? 'Finished' : 'Active' }}</p>
-            <p>Created Date: {{ new Date(todo.createdDate).toLocaleDateString() }}</p>
-            <p>Due Date: {{ new Date(todo.dueDate).toLocaleDateString() }}</p>
-            <p v-if="todo.assigneeIdList && todo.assigneeIdList.length > 0">Assigned to: {{ getAssigneesNames(todo.assigneeIdList) }}</p>
-            <div class="button-group">
-                <Button @click="deleteItem" class="delete-button">
-                    <FontAwesomeIcon icon="trash"/> Delete
-                </Button>
-                <Button @click="editItem" class="edit-button">
-                    <FontAwesomeIcon icon="edit"/> Edit
-                </Button>
-            </div>
-        </div>
-    </div>
+        <v-card v-if="todo && activeTab === 'todo'" class="mb-4">
+            <v-card-title>
+                <v-checkbox v-model="todo.finished" @change="updateToDoStatus(todo)" class="mr-2"></v-checkbox>
+                {{ todo.title }}
+            </v-card-title>
+            <v-card-text>
+                <p class="text-truncate">{{ todo.description }}</p>
+                <p>ID: {{ todo.id }}</p>
+                <p>Due Date: {{ new Date(todo.dueDate).toLocaleDateString() }}</p>
+                <p>Assigned to: {{ getAssigneesForTodo(todo) }}</p>
+                <p>Category: {{ todo.category }}</p>
+            </v-card-text>
+            <v-card-actions>
+                <v-btn @click="editItem" color="warning">
+                    <v-icon left>mdi-pencil</v-icon>
+                    Edit
+                </v-btn>
+                <v-btn @click="deleteItem" color="error">
+                    <v-icon left>mdi-delete</v-icon>
+                    Delete
+                </v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-container>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { Alert, Button } from "agnostic-vue";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import config from "@/config";
 import { showToast, Toast } from "@/ts/toasts";
 import { faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
@@ -69,7 +90,10 @@ interface ToDo {
     finished: boolean;
     createdDate: string;
     dueDate: string;
+    completedDate: string | null | undefined;
+    assigneeList: Assignee[];
     assigneeIdList: number[];
+    category: string;
 }
 
 const router = useRouter();
@@ -135,11 +159,43 @@ function editItem() {
     }
 }
 
-function getAssigneesNames(assigneeIds: number[]): string {
-    return assigneeIds.map(id => {
-        const assignee = assignees.value.find(a => a.id === id);
-        return assignee ? `${assignee.prename} ${assignee.name}` : 'Unknown';
-    }).join(', ');
+function getAssigneesForTodo(todo: ToDo): string {
+    if (!todo.assigneeList?.length) {
+        return "No assignees";
+    }
+    return todo.assigneeList
+        .map(assignee => `${assignee.prename} ${assignee.name}`)
+        .join(", ");
+}
+
+async function updateToDoStatus(todo: ToDo) {
+    const updateData = {
+        id: todo.id,
+        title: todo.title,
+        description: todo.description,
+        finished: todo.finished,
+        completedDate: todo.finished ? new Date().toISOString() : null,
+        assigneeIdList: todo.assigneeList.map(assignee => assignee.id),
+        assigneeList: todo.assigneeList,
+        dueDate: todo.dueDate,
+        category: todo.category
+    };
+
+    try {
+        const response = await fetch(`${config.apiBaseUrl}/todos/${todo.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updateData),
+        });
+        if (!response.ok) {
+            throw new Error('Failed to update todo status');
+        }
+        todo.completedDate = updateData.completedDate;
+    } catch (error) {
+        showToast(new Toast("Error", "Failed to update todo status", "error", faXmark));
+    }
 }
 
 function fetchAssignees() {
@@ -157,88 +213,9 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.tab-container {
-    display: flex;
-    margin-bottom: 20px;
-}
-
-.tab-container button {
-    flex: 1;
-    padding: 10px;
-    background-color: #3498db;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
-
-.tab-container button.active {
-    background-color: #2980b9;
-}
-
-.input-container {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.input-container input {
-    flex-grow: 1;
-    padding: 0.5rem;
-    border-radius: 0.25rem;
-    border: 0.1rem solid #ccc;
-}
-
-.itemBox {
-    padding: 20px;
-    margin-bottom: 15px;
-    background-color: #4a4a4a;
-    border-radius: 0.5rem;
-    box-shadow: 0.25rem 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
-}
-
-.itemBox h3 {
-    margin-top: 0;
-}
-
-.itemBox p {
-    margin-bottom: 0.5rem;
-}
-
-.button-group {
-    display: flex;
-    gap: 0.5rem;
-}
-
-button {
-    color: white;
-    border-radius: 0.25rem;
-    border: none;
-    padding: 0.5rem 0.75rem;
-    transition: background-color 0.3s ease;
-    cursor: pointer;
-}
-
-.fetch-button {
-    background-color: #3498db;
-}
-
-.fetch-button:hover {
-    background-color: #2980b9;
-}
-
-.delete-button {
-    background-color: #e74c3c;
-}
-
-.delete-button:hover {
-    background-color: #c0392b;
-}
-
-.edit-button {
-    background-color: #f1c40f;
-}
-
-.edit-button:hover {
-    background-color: #f39c12;
+.text-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 </style>
