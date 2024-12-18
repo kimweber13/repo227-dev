@@ -33,7 +33,7 @@ The frontend consists different components:
 
 >5. Run the project with maven: `npm run dev`
 
-Now the application is running and available at `http://localhost:5173/` in your browser.
+Now the application is running and usualy available at `http://localhost:5173/` in your browser. If it is not the case, please check the console output of the terminal.
 
 ## User Manual
 
