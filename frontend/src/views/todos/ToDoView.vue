@@ -68,67 +68,84 @@
 
             <!-- Rechte Hälfte: Formular zum Erstellen eines neuen ToDos und abgeschlossene ToDos -->
             <v-col cols="12" md="6">
-<!--                <v-row align="center" class="mb-4">-->
-<!--                    <v-spacer></v-spacer>-->
-<!--                    <v-col cols="12" sm="4" class="text-right">-->
-<!--                        <v-btn color="primary" @click="navigateToCreate">-->
-<!--                            Create New ToDo-->
-<!--                        </v-btn>-->
-<!--                    </v-col>-->
-<!--                </v-row>-->
-<!--                <h2 class="text-h5 mb-3">Create New ToDo</h2>-->
-<!--                <v-form @submit.prevent="submitForm">-->
-<!--                    <v-text-field v-model="newTodo.title" label="Title" required></v-text-field>-->
-<!--                    <v-textarea v-model="newTodo.description" label="Description" required></v-textarea>-->
-<!--                    <v-text-field v-model="dueDateInput" label="Due Date" type="datetime-local" required></v-text-field>-->
-<!--                    <v-select-->
-<!--                        v-model="newTodo.assigneeIdList"-->
-<!--                        :items="assigneeItems"-->
-<!--                        item-text="name"-->
-<!--                        item-value="id"-->
-<!--                        label="Assignees"-->
-<!--                        multiple-->
-<!--                        chips-->
-<!--                    >-->
-<!--                        <template v-slot:selection="{ item }">-->
-<!--                            <v-chip>{{ item.name }}</v-chip>-->
-<!--                        </template>-->
-<!--                    </v-select>-->
-<!--                    <v-text-field v-model="newTodo.category" label="Category"></v-text-field>-->
-<!--                    <v-btn type="submit" color="primary" class="mt-4">Create ToDo</v-btn>-->
-<!--                </v-form>-->
 
-                <h2 class="text-h5 mb-3">Completed ToDos</h2>
-                <v-alert v-if="completedTodos.length === 0" type="warning" class="mb-4">
-                    No completed ToDos available or match the filter...
-                </v-alert>
-                <v-row v-else>
-                    <v-col v-for="todo in completedTodos" :key="todo.id" cols="12" sm="6" md="12">
-                        <v-card class="completed">
-                            <v-card-title>
-                                <v-checkbox v-model="todo.finished" @change="updateToDoStatus(todo)" class="mr-2"></v-checkbox>
-                                {{ todo.title }}
-                            </v-card-title>
-                            <v-card-text>
-                                <p>ID: {{ todo.id }}</p>
-                                <p class="text-truncate">{{ todo.description }}</p>
-                                <p>Completed Date: {{ new Date(todo.completedDate as string).toLocaleDateString() }}</p>
-                                <p>Assigned to: {{ getAssigneesForTodo(todo) }}</p>
-                                <p>Category: {{ todo.category }}</p>
-                            </v-card-text>
-                            <v-card-actions>
-                                <v-btn @click="editToDo(todo.id)" color="warning">
-                                    <v-icon left>mdi-pencil</v-icon>
-                                    Edit
-                                </v-btn>
-                                <v-btn @click="deleteToDo(todo.id)" color="error">
-                                    <v-icon left>mdi-delete</v-icon>
-                                    Delete
-                                </v-btn>
-                            </v-card-actions>
-                        </v-card>
-                    </v-col>
-                </v-row>
+                <v-expansion-panels v-model="createTodoPanel">
+                    <v-expansion-panel>
+                        <v-expansion-panel-title>
+                            <h2 class="text-h5">Create New ToDo</h2>
+                        </v-expansion-panel-title>
+                        <v-expansion-panel-text>
+                            <v-form @submit.prevent="submitForm">
+                                <v-text-field
+                                    v-model="newTodo.title"
+                                    label="Title"
+                                    required
+                                ></v-text-field>
+                                <v-textarea
+                                    v-model="newTodo.description"
+                                    label="Description"
+                                    required
+                                ></v-textarea>
+                                <v-text-field
+                                    v-model="dueDateInput"
+                                    label="Due Date"
+                                    type="datetime-local"
+                                    required
+                                ></v-text-field>
+                                <v-card class="mb-4">
+                                    <v-card-title>Assignees</v-card-title>
+                                    <v-card-text>
+                                        <v-checkbox
+                                            v-for="assignee in assignees"
+                                            :key="assignee.id"
+                                            v-model="newTodo.assigneeIdList"
+                                            :label="`${assignee.prename} ${assignee.name}`"
+                                            :value="assignee.id"
+                                        ></v-checkbox>
+                                    </v-card-text>
+                                </v-card>
+                                <v-btn type="submit" color="primary" class="custom-btn">Create ToDo</v-btn>
+                            </v-form>
+                        </v-expansion-panel-text>
+                    </v-expansion-panel>
+                </v-expansion-panels>
+
+
+                <v-expansion-panels>
+                    <v-expansion-panel>
+                        <v-expansion-panel-title>
+                            <h2 class="text-h5">Completed ToDos</h2>
+                        </v-expansion-panel-title>
+                        <v-expansion-panel-text>
+                            <v-alert v-if="completedTodos.length === 0" type="warning" class="mt-4">
+                                No completed ToDos available or match the filter...
+                            </v-alert>
+                            <v-card v-for="todo in completedTodos" :key="todo.id" class="mt-4 completed" color="#F6F6F6">
+                                <v-card-title>
+                                    <v-checkbox v-model="todo.finished" @change="updateToDoStatus(todo)" class="mr-2"></v-checkbox>
+                                    {{ todo.title }}
+                                </v-card-title>
+                                <v-card-text>
+                                    <p>ID: {{ todo.id }}</p>
+                                    <p class="text-truncate">{{ todo.description }}</p>
+                                    <p>Completed Date: {{ new Date(todo.completedDate as string).toLocaleDateString() }}</p>
+                                    <p>Assigned to: {{ getAssigneesForTodo(todo) }}</p>
+                                    <p>Category: {{ todo.category }}</p>
+                                </v-card-text>
+                                <v-card-actions>
+                                    <v-btn @click="editToDo(todo.id)" color="warning">
+                                        <v-icon left>mdi-pencil</v-icon>
+                                        Edit
+                                    </v-btn>
+                                    <v-btn @click="deleteToDo(todo.id)" color="error">
+                                        <v-icon left>mdi-delete</v-icon>
+                                        Delete
+                                    </v-btn>
+                                </v-card-actions>
+                            </v-card>
+                        </v-expansion-panel-text>
+                    </v-expansion-panel>
+                </v-expansion-panels>
             </v-col>
         </v-row>
     </v-container>
@@ -201,6 +218,8 @@ const assigneeItems = computed(() => {
         name: `${assignee.prename} ${assignee.name}`
     }));
 });
+
+const createTodoPanel = ref([0]); // Panel standardmäßig geöffnet
 
 function fetchAllToDos() {
     fetch(`${config.apiBaseUrl}/todos`)
