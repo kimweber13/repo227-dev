@@ -49,14 +49,8 @@ function exportToCsv() {
     <v-app>
         <v-app-bar app>
             <v-container class="d-flex align-center">
-                <v-btn to="/about">
-                    <v-img
-                        src="/PersonalIcon.png"
-                        max-height="10"
-                        max-width="10"
-                        contain
-                        background-color="grey lighten-2"
-                    ></v-img>
+                <v-btn to="/about" class="custom-btn">
+                    <v-icon>mdi-checkbox-marked-circle-outline</v-icon>ToDo List
                 </v-btn>
                 <v-spacer></v-spacer>
                 <v-tabs>

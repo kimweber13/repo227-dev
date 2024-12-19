@@ -64,12 +64,9 @@ onMounted(() => fetchAllAssignees());
                 </v-btn>
             </v-col>
         </v-row>
-<!--        <v-btn @click="navigateToCreate" color="primary" class="mb-4">Create New Assignee</v-btn>-->
-
         <v-alert v-if="assignees.length === 0" type="warning" class="mb-4">
             No assignees available on the server...
         </v-alert>
-
         <v-row v-else>
             <v-col v-for="assignee in assignees" :key="assignee.id" cols="12" sm="6" md="4">
                 <v-card>

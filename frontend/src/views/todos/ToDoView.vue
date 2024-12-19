@@ -2,9 +2,7 @@
     <v-container fluid>
         <v-row align="start" class="mb-2">
             <v-col cols="12" sm="2" class="text-right">
-                <v-btn class="custom-btn" color="primary" @click="navigateToCreate" block>
-                    <v-icon left>mdi-file-plus</v-icon> Create ToDo
-                </v-btn>
+
             </v-col>
             <v-spacer></v-spacer>
             <v-col cols="12" sm="2" class="text-right">
@@ -35,7 +33,6 @@
             </v-col>
         </v-row>
         <v-row>
-            <!-- Linke Hälfte: Aktive ToDos -->
             <v-col cols="12" md="6">
                 <h2 class="text-h5 mb-3">Active ToDos</h2>
                 <v-alert v-if="activeTodos.length === 0" type="warning" class="mt-4">
@@ -66,7 +63,6 @@
                 </v-card>
             </v-col>
 
-            <!-- Rechte Hälfte: Formular zum Erstellen eines neuen ToDos und abgeschlossene ToDos -->
             <v-col cols="12" md="6">
 
                 <v-expansion-panels v-model="createTodoPanel">
@@ -104,12 +100,13 @@
                                         ></v-checkbox>
                                     </v-card-text>
                                 </v-card>
-                                <v-btn type="submit" color="primary" class="custom-btn">Create ToDo</v-btn>
+                                <v-btn type="submit" color="primary" class="custom-btn">
+                                    <v-icon left>mdi-file-plus</v-icon>Create ToDo
+                                </v-btn>
                             </v-form>
                         </v-expansion-panel-text>
                     </v-expansion-panel>
                 </v-expansion-panels>
-
 
                 <v-expansion-panels>
                     <v-expansion-panel>
@@ -219,7 +216,7 @@ const assigneeItems = computed(() => {
     }));
 });
 
-const createTodoPanel = ref([0]); // Panel standardmäßig geöffnet
+const createTodoPanel = ref([0]);
 
 function fetchAllToDos() {
     fetch(`${config.apiBaseUrl}/todos`)
