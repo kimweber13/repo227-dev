@@ -18,9 +18,13 @@
                 type="email"
                 required
             ></v-text-field>
-            <v-btn type="submit" color="primary" class="mt-4">
-                {{ isEditing ? 'Update' : 'Create' }} Assignee
-            </v-btn>
+            <v-row align="center" class="mb-2">
+                <v-btn color="primary" class="mt-4" @click="navigateBack">Back</v-btn>
+                <v-spacer></v-spacer>
+                <v-btn type="submit" color="primary" class="mt-4">
+                    {{ isEditing ? 'Update' : 'Create' }} Assignee
+                </v-btn>
+            </v-row>
         </v-form>
     </v-container>
 </template>
@@ -81,5 +85,9 @@ function submitForm() {
             router.push('/assignees');
         })
         .catch(error => showToast(new Toast('Error', error.message, 'error', faXmark)));
+}
+
+function navigateBack() {
+    router.push('/assignees');
 }
 </script>
