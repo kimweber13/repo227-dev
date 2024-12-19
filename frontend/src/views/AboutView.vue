@@ -32,7 +32,7 @@ onMounted(async () => {
   max-width: 800px;
   margin: 0 auto;
   padding: 40px;
-  background-color: #2e2e2e;
+  background-color: #eaeaea;
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
@@ -57,7 +57,7 @@ h1 {
 }
 
 .content pre {
-  background-color: #272c34; /* Dark background for code blocks */
+  background-color: #eaeaea; /* Dark background for code blocks */
   color: #ffffff; /* White text for code */
   padding: 10px;
   border-radius: 5px;

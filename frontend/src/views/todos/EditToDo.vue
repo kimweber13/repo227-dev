@@ -1,41 +1,44 @@
 <template>
-    <div>
-        <h1>Edit ToDo</h1>
-        <form @submit.prevent="submitForm">
-            <div>
-                <label for="title">Title:</label>
-                <input type="text" v-model="todo.title" required />
-            </div>
-            <div>
-                <label for="description">Description:</label>
-                <textarea v-model="todo.description" required></textarea>
-            </div>
-            <div>
-                <label for="dueDate">Due Date:</label>
-                <input type="datetime-local" v-model="dueDateInput" required />
-            </div>
-            <div>
-                <label>Assignees:</label>
-                <div v-for="assignee in assignees" :key="assignee.id" style="display: flex; align-items: center;">
-                    <input
-                        type="checkbox"
-                        :id="'assignee-' + assignee.id"
-                        :checked="todo.assigneeIdList.includes(assignee.id)"
-                        @change="toggleAssignee(assignee.id)"
-                    >
-                    <label :for="'assignee-' + assignee.id" style="margin-left: 5px;">
-                        {{ assignee.prename }} {{ assignee.name }}
-                    </label>
-                </div>
-            </div>
-            <div>
-                <label for="finished">Finished:</label>
-                <input type="checkbox" v-model="todo.finished" id="finished" />
-            </div>
-            <button type="submit">Update</button>
-        </form>
-    </div>
+    <v-container>
+        <h1 class="text-h4 mb-4">Edit ToDo</h1>
+        <v-form @submit.prevent="submitForm">
+            <v-text-field
+                v-model="todo.title"
+                label="Title"
+                required
+            ></v-text-field>
+            <v-textarea
+                v-model="todo.description"
+                label="Description"
+                required
+            ></v-textarea>
+            <v-text-field
+                v-model="dueDateInput"
+                label="Due Date"
+                type="datetime-local"
+                required
+            ></v-text-field>
+            <v-card class="mb-4">
+                <v-card-title>Assignees</v-card-title>
+                <v-card-text>
+                    <v-checkbox
+                        v-for="assignee in assignees"
+                        :key="assignee.id"
+                        v-model="todo.assigneeIdList"
+                        :label="`${assignee.prename} ${assignee.name}`"
+                        :value="assignee.id"
+                    ></v-checkbox>
+                </v-card-text>
+            </v-card>
+            <v-checkbox
+                v-model="todo.finished"
+                label="Finished"
+            ></v-checkbox>
+            <v-btn type="submit" color="primary" class="mt-4">Update ToDo</v-btn>
+        </v-form>
+    </v-container>
 </template>
+
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
@@ -180,54 +183,3 @@ function submitForm() {
         .catch(error => showToast(new Toast('Error', error.message, 'error', faXmark)));
 }
 </script>
-
-<style scoped>
-form {
-    background-color: #4a4a4a;
-    padding: 20px;
-    border-radius: 0.5rem;
-    box-shadow: 0.25rem 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
-    max-width: 600px;
-    margin: auto;
-}
-
-form div {
-    margin-bottom: 0.75rem;
-}
-
-form label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 0.25rem;
-}
-
-form input[type=text],
-form textarea,
-form input[type=datetime-local] {
-    width: 100%;
-    padding: 0.5rem;
-    border-radius: 0.25rem;
-    border: 0.1rem solid #ccc;
-}
-
-form input[type=text]:focus,
-form textarea:focus,
-form input[type=datetime-local]:focus {
-    outline: none;
-    border-color: #3498db;
-}
-
-button[type=submit] {
-    background-color: #3498db;
-    color: white;
-    border-radius: 0.25rem;
-    border: none;
-    padding: 0.5rem 0.75rem;
-    transition: background-color 0.3s ease;
-    cursor: pointer;
-}
-
-button[type=submit]:hover {
-    background-color: #2980b9;
-}
-</style>

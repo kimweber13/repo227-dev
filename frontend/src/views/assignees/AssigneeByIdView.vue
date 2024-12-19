@@ -1,42 +1,53 @@
 <template>
-    <div>
-        <h1>Assignee by ID</h1>
-        <div class="input-container">
-            <input type="number" v-model="assigneeId" placeholder="Enter Assignee ID" />
-            <Button @click="fetchAssignee" class="fetch-button">Fetch Assignee</Button>
-        </div>
+    <v-container>
+        <h1 class="text-h4 mb-4">Search Assignee by ID</h1>
+        <v-row class="mb-4">
+            <v-col cols="12" sm="8">
+                <v-text-field
+                    v-model="searchId"
+                    label="Enter Assignee ID"
+                    type="number"
+                    outlined
+                    dense
+                ></v-text-field>
+            </v-col>
+            <v-col cols="12" sm="4">
+                <v-btn @click="fetchAssignee" color="primary" block height="56">
+                    Fetch Assignee
+                </v-btn>
+            </v-col>
+        </v-row>
 
-        <Alert v-if="error" type="error">
+        <v-alert v-if="error" type="error" class="mb-4">
             {{ error }}
-        </Alert>
+        </v-alert>
 
-        <div v-if="assignee" class="assigneeBox">
-            <h3>{{ assignee.prename }} {{ assignee.name }}</h3>
-            <p>Email: {{ assignee.email }}</p>
-            <div class="button-group">
-                <Button @click="deleteAssignee" class="delete-button">
-                    <FontAwesomeIcon icon="trash"/> Delete
-                </Button>
-                <Button @click="editAssignee" class="edit-button">
-                    <FontAwesomeIcon icon="edit"/> Edit
-                </Button>
-            </div>
-        </div>
-    </div>
+        <v-card v-if="assignee" class="mb-4">
+            <v-card-title>{{ assignee.prename }} {{ assignee.name }}</v-card-title>
+            <v-card-text>
+                <p>Email: {{ assignee.email }}</p>
+            </v-card-text>
+            <v-card-actions>
+                <v-btn @click="deleteAssignee" color="error">
+                    <v-icon left>mdi-delete</v-icon>
+                    Delete
+                </v-btn>
+                <v-btn @click="editAssignee" color="warning">
+                    <v-icon left>mdi-pencil</v-icon>
+                    Edit
+                </v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-container>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { Alert, Button } from "agnostic-vue";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import config from "@/config";
 import { showToast, Toast } from "@/ts/toasts";
 import { faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 
-/**
- * Interface representing an Assignee.
- */
 interface Assignee {
     id: number;
     prename: string;
@@ -45,22 +56,17 @@ interface Assignee {
 }
 
 const router = useRouter();
-const assigneeId = ref<number | null>(null);
+const searchId = ref<number | null>(null);
 const assignee = ref<Assignee | null>(null);
 const error = ref<string | null>(null);
 
-/**
- * Fetches the assignee details based on the provided assignee ID.
- * If the assignee is found, it updates the assignee reference.
- * If an error occurs, it updates the error reference.
- */
 function fetchAssignee() {
-    if (!assigneeId.value) {
+    if (!searchId.value) {
         error.value = "Please enter an Assignee ID";
         return;
     }
 
-    fetch(`${config.apiBaseUrl}/assignees/${assigneeId.value}`)
+    fetch(`${config.apiBaseUrl}/assignees/${searchId.value}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error("Assignee not found");
@@ -77,97 +83,20 @@ function fetchAssignee() {
         });
 }
 
-/**
- * Deletes the currently fetched assignee.
- * If the deletion is successful, it shows a success toast and clears the assignee reference.
- * If an error occurs, it shows an error toast.
- */
 function deleteAssignee() {
     if (!assignee.value) return;
 
     fetch(`${config.apiBaseUrl}/assignees/${assignee.value.id}`, { method: "DELETE" })
         .then(() => {
-            showToast(new Toast("Alert", `Successfully deleted assignee with ID ${assignee.value?.id}!`, "success", faCheck));
+            showToast(new Toast("Alert", `Successfully deleted Assignee with ID ${assignee.value?.id}!`, "success", faCheck));
             assignee.value = null;
         })
         .catch(error => showToast(new Toast("Error", error.message, "error", faXmark)));
 }
 
-/**
- * Navigates to the edit page for the currently fetched assignee.
- */
 function editAssignee() {
     if (assignee.value) {
         router.push(`/assignees/${assignee.value.id}/edit`);
     }
 }
 </script>
-
-<style scoped>
-.input-container {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.input-container input {
-    flex-grow: 1;
-    padding: 0.5rem;
-    border-radius: 0.25rem;
-    border: 0.1rem solid #ccc;
-}
-
-.assigneeBox {
-    padding: 20px;
-    margin-bottom: 15px;
-    background-color: #4a4a4a;
-    border-radius: 0.5rem;
-    box-shadow: 0.25rem 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
-}
-
-.assigneeBox h3 {
-    margin-top: 0;
-}
-
-.assigneeBox p {
-    margin-bottom: 0.5rem;
-}
-
-.button-group {
-    display: flex;
-    gap: 0.5rem;
-}
-
-button {
-    color: white;
-    border-radius: 0.25rem;
-    border: none;
-    padding: 0.5rem 0.75rem;
-    transition: background-color 0.3s ease;
-    cursor: pointer;
-}
-
-.fetch-button {
-    background-color: #3498db;
-}
-
-.fetch-button:hover {
-    background-color: #2980b9;
-}
-
-.delete-button {
-    background-color: #e74c3c;
-}
-
-.delete-button:hover {
-    background-color: #c0392b;
-}
-
-.edit-button {
-    background-color: #f1c40f;
-}
-
-.edit-button:hover {
-    background-color: #f39c12;
-}
-</style>

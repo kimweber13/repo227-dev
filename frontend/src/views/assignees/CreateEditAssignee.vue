@@ -1,22 +1,28 @@
 <template>
-    <div>
-        <h1>{{ isEditing ? 'Edit Assignee' : 'Create Assignee' }}</h1>
-        <form @submit.prevent="submitForm">
-            <div>
-                <label for="prename">Prename:</label>
-                <input type="text" v-model="assignee.prename" required />
-            </div>
-            <div>
-                <label for="name">Name:</label>
-                <input type="text" v-model="assignee.name" required />
-            </div>
-            <div>
-                <label for="email">Email:</label>
-                <input type="email" v-model="assignee.email" required />
-            </div>
-            <button type="submit">{{ isEditing ? 'Update' : 'Create' }}</button>
-        </form>
-    </div>
+    <v-container>
+        <h1 class="text-h4 mb-4">{{ isEditing ? 'Edit' : 'Create' }} Assignee</h1>
+        <v-form @submit.prevent="submitForm">
+            <v-text-field
+                v-model="assignee.prename"
+                label="First Name"
+                required
+            ></v-text-field>
+            <v-text-field
+                v-model="assignee.name"
+                label="Last Name"
+                required
+            ></v-text-field>
+            <v-text-field
+                v-model="assignee.email"
+                label="Email"
+                type="email"
+                required
+            ></v-text-field>
+            <v-btn type="submit" color="primary" class="mt-4">
+                {{ isEditing ? 'Update' : 'Create' }} Assignee
+            </v-btn>
+        </v-form>
+    </v-container>
 </template>
 
 <script setup lang="ts">
@@ -26,9 +32,6 @@ import { showToast, Toast } from '@/ts/toasts';
 import config from '@/config';
 import { faCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
 
-/**
- * Represents an assignee with optional ID, prename, name, and email.
- */
 interface Assignee {
     id?: number;
     prename: string;
@@ -38,40 +41,41 @@ interface Assignee {
 
 const route = useRoute();
 const router = useRouter();
+const assignee = ref<Assignee>({
+    prename: '',
+    name: '',
+    email: ''
+});
 const isEditing = ref(false);
-const assignee = ref<Assignee>({ prename: '', name: '', email: '' });
 
 onMounted(() => {
     if (route.params.id) {
         isEditing.value = true;
-        fetch(`${config.apiBaseUrl}/assignees/${route.params.id}`)
-            .then(response => response.json())
-            .then(data => {
-                assignee.value = data;
-            })
-            .catch(error => showToast(new Toast('Error', error.message, 'error', faXmark)));
+        fetchAssignee();
     }
 });
 
-/**
- * Submits the form to create or update an assignee.
- * Determines the HTTP method (POST for create, PUT for update) based on the `isEditing` flag.
- * Constructs the appropriate URL for the API request.
- * Sends the assignee data to the server.
- * Displays a success toast message and navigates to the assignees list on success.
- * Displays an error toast message if the request fails.
- */
+function fetchAssignee() {
+    fetch(`${config.apiBaseUrl}/assignees/${route.params.id}`)
+        .then(response => response.json())
+        .then(data => {
+            assignee.value = data;
+        })
+        .catch(error => showToast(new Toast('Error', error.message, 'error', faXmark)));
+}
+
 function submitForm() {
-    const method = isEditing.value ? 'PUT' : 'POST';
     const url = isEditing.value
         ? `${config.apiBaseUrl}/assignees/${route.params.id}`
         : `${config.apiBaseUrl}/assignees`;
+    const method = isEditing.value ? 'PUT' : 'POST';
 
     fetch(url, {
-        method,
+        method: method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(assignee.value),
     })
+        .then(response => response.json())
         .then(() => {
             showToast(new Toast('Success', `Assignee ${isEditing.value ? 'updated' : 'created'} successfully!`, 'success', faCheck));
             router.push('/assignees');
@@ -79,61 +83,3 @@ function submitForm() {
         .catch(error => showToast(new Toast('Error', error.message, 'error', faXmark)));
 }
 </script>
-
-
-<style scoped>
-
-form{
-    background-color: #4a4a4a;
-    padding: 20px;
-    border-radius: 0.5rem;
-    box-shadow: 0.25rem 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
-    max-width: 600px;
-    margin: auto;
-}
-
-form div{
-    margin-bottom: 0.75rem;
-}
-
-form label{
-    display: block;
-    font-weight: bold;
-    margin-bottom: 0.25rem;
-}
-
-form input[type=text],
-form input[type=email],
-form input[type=date],
-form textarea,
-form select{
-    width: 100%;
-    padding: 0.5rem;
-    border-radius: 0.25rem;
-    border: 0.1rem solid #ccc;
-}
-
-form input[type=text]:focus,
-form input[type=email]:focus,
-form input[type=date]:focus,
-form textarea:focus,
-form select:focus{
-    outline: none;
-    border-color: #3498db;
-}
-
-button[type=submit]{
-    background-color: #3498db;
-    color: white;
-    border-radius: 0.25rem;
-    border: none;
-    padding: 0.5rem 0.75rem;
-    transition: background-color 0.3s ease;
-    cursor: pointer;
-}
-
-button[type=submit]:hover{
-    background-color: #2980b9;
-}
-</style>
-
