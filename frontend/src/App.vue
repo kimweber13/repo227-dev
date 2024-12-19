@@ -3,9 +3,11 @@ import { RouterView } from 'vue-router';
 import { ref, computed } from 'vue';
 import { saveAs } from 'file-saver';
 import config from "@/config";
+import { mdiCheckCircle, mdiAlertCircle, mdiHome } from '@mdi/js';
 
 const isExporting = ref(false);
 const exportStatus = ref('');
+const snackbarIcon = ref('');
 
 const showSnackbar = computed({
     get: () => !!exportStatus.value,
@@ -27,10 +29,12 @@ function exportToCsv() {
         .then(blob => {
             saveAs(blob, "todos_export.csv");
             exportStatus.value = 'Export successful!';
+            snackbarIcon.value = mdiCheckCircle;
         })
         .catch(error => {
             console.error('Export failed:', error);
             exportStatus.value = 'Export failed. Please try again.';
+            snackbarIcon.value = mdiAlertCircle;
         })
         .finally(() => {
             isExporting.value = false;
@@ -45,16 +49,23 @@ function exportToCsv() {
     <v-app>
         <v-app-bar app>
             <v-container class="d-flex align-center">
+                <v-btn to="/about">
+                    <v-img
+                        src="/PersonalIcon.png"
+                        max-height="10"
+                        max-width="10"
+                        contain
+                        background-color="grey lighten-2"
+                    ></v-img>
+                </v-btn>
+                <v-spacer></v-spacer>
                 <v-tabs>
-                    <v-tab to="/">Home</v-tab>
-                    <v-tab to="/about">About</v-tab>
-                    <v-tab to="/assignees">Assignees</v-tab>
                     <v-tab to="/todos">ToDos</v-tab>
-                    <v-tab to="/search-by-id">Search by ID</v-tab>
+                    <v-tab to="/assignees">Assignees</v-tab>
                 </v-tabs>
                 <v-spacer></v-spacer>
-                <v-btn @click="exportToCsv" :loading="isExporting" color="primary">
-                    {{ isExporting ? 'Exporting...' : 'Export ToDos' }}
+                <v-btn class="custom-btn" @click="exportToCsv" :loading="isExporting" color="primary">
+                    <v-icon left>mdi-file-download</v-icon>{{ isExporting ? 'Exporting...' : 'Export ToDos' }}
                 </v-btn>
             </v-container>
         </v-app-bar>
@@ -66,6 +77,7 @@ function exportToCsv() {
         </v-main>
 
         <v-snackbar v-model="showSnackbar" :timeout="3000" color="info">
+            <v-icon :icon="snackbarIcon" class="mr-2"></v-icon>
             {{ exportStatus }}
             <template v-slot:actions>
                 <v-btn color="white" text @click="showSnackbar = false">
@@ -77,5 +89,26 @@ function exportToCsv() {
 </template>
 
 <style scoped>
-/* You can add any additional custom styles here if needed */
+.text-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.custom-btn {
+    background-color: white !important;
+    color: #1976D2 !important;
+    box-shadow: none !important;
+    border: none !important;
+
+}
+
+.custom-btn:hover {
+    background-color: #daebff !important;
+    color: #1976D2 !important;
+}
+
+.custom-btn::before {
+    display: none;
+}
 </style>

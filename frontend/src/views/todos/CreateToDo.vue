@@ -31,9 +31,9 @@
                 </v-card-text>
             </v-card>
             <v-row align="center" class="mb-2">
-                <v-btn color="primary" class="mt-4" @click="navigateBack">Back</v-btn>
+                <v-btn color="primary" class="custom-btn" @click="navigateBack">Back</v-btn>
                 <v-spacer></v-spacer>
-                <v-btn type="submit" color="primary" class="mt-4">Create ToDo</v-btn>
+                <v-btn type="submit" color="primary" class="custom-btn">Create ToDo</v-btn>
             </v-row>
 
         </v-form>
@@ -109,3 +109,28 @@ function navigateBack() {
     router.push('/todos');
 }
 </script>
+
+<style scoped>
+.text-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.custom-btn {
+    background-color: white !important;
+    color: #1976D2 !important;
+    box-shadow: none !important;
+    border: none !important;
+    margin-top: 16px !important;
+}
+
+.custom-btn:hover {
+    background-color: #daebff !important;
+    color: #1976D2 !important;
+}
+
+.custom-btn::before {
+    display: none;
+}
+</style>

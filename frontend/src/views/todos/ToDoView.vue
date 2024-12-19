@@ -1,28 +1,43 @@
 <template>
     <v-container fluid>
-        <v-row>
-            <!-- Linke Hälfte: Aktive ToDos -->
-            <v-col cols="12" md="6">
-                <h2 class="text-h5 mb-3">Active ToDos</h2>
+        <v-row align="start" class="mb-2">
+            <v-col cols="12" sm="2" class="text-right">
+                <v-btn class="custom-btn" color="primary" @click="navigateToCreate" block>
+                    <v-icon left>mdi-file-plus</v-icon> Create ToDo
+                </v-btn>
+            </v-col>
+            <v-spacer></v-spacer>
+            <v-col cols="12" sm="2" class="text-right">
+                <v-btn class="custom-btn" color="primary" @click="navigateToSearch" block>
+                    <v-icon left>mdi-magnify</v-icon> Search ToDo
+                </v-btn>
+            </v-col>
+        </v-row>
+
+        <v-row class="mt-n2">
+            <v-col cols="12" sm="8">
                 <v-text-field
                     v-model="titleFilter"
                     label="Filter by title"
                     outlined
                     dense
-                    class="mb-4"
                 ></v-text-field>
-                <v-row>
-                    <v-col cols="6">
-                        <v-btn @click="toggleSort('title')" block>
-                            Sort by Title {{ sortBy === 'title' ? (sortOrder === 'asc' ? '↑' : '↓') : '' }}
-                        </v-btn>
-                    </v-col>
-                    <v-col cols="6">
-                        <v-btn @click="toggleSort('dueDate')" block>
-                            Sort by Due Date {{ sortBy === 'dueDate' ? (sortOrder === 'asc' ? '↑' : '↓') : '' }}
-                        </v-btn>
-                    </v-col>
-                </v-row>
+            </v-col>
+            <v-col cols="12" sm="2">
+                <v-btn @click="toggleSort('title')" block height="56">
+                    Sort by Title {{ sortBy === 'title' ? (sortOrder === 'asc' ? '↑' : '↓') : '' }}
+                </v-btn>
+            </v-col>
+            <v-col cols="12" sm="2">
+                <v-btn @click="toggleSort('dueDate')" block height="56">
+                    Sort by Due Date {{ sortBy === 'dueDate' ? (sortOrder === 'asc' ? '↑' : '↓') : '' }}
+                </v-btn>
+            </v-col>
+        </v-row>
+        <v-row>
+            <!-- Linke Hälfte: Aktive ToDos -->
+            <v-col cols="12" md="6">
+                <h2 class="text-h5 mb-3">Active ToDos</h2>
                 <v-alert v-if="activeTodos.length === 0" type="warning" class="mt-4">
                     No active ToDos available or match the filter...
                 </v-alert>
@@ -32,8 +47,8 @@
                         {{ todo.title }}
                     </v-card-title>
                     <v-card-text>
-                        <p class="text-truncate">{{ todo.description }}</p>
                         <p>ID: {{ todo.id }}</p>
+                        <p class="text-truncate">{{ todo.description }}</p>
                         <p>Due Date: {{ new Date(todo.dueDate as string).toLocaleDateString() }}</p>
                         <p>Assigned to: {{ getAssigneesForTodo(todo) }}</p>
                         <p>Category: {{ todo.category }}</p>
@@ -53,34 +68,42 @@
 
             <!-- Rechte Hälfte: Formular zum Erstellen eines neuen ToDos und abgeschlossene ToDos -->
             <v-col cols="12" md="6">
-                <h2 class="text-h5 mb-3">Create New ToDo</h2>
-                <v-form @submit.prevent="submitForm">
-                    <v-text-field v-model="newTodo.title" label="Title" required></v-text-field>
-                    <v-textarea v-model="newTodo.description" label="Description" required></v-textarea>
-                    <v-text-field v-model="dueDateInput" label="Due Date" type="datetime-local" required></v-text-field>
-                    <v-select
-                        v-model="newTodo.assigneeIdList"
-                        :items="assigneeItems"
-                        item-text="name"
-                        item-value="id"
-                        label="Assignees"
-                        multiple
-                        chips
-                    >
-                        <template v-slot:selection="{ item }">
-                            <v-chip>{{ item.name }}</v-chip>
-                        </template>
-                    </v-select>
-                    <v-text-field v-model="newTodo.category" label="Category"></v-text-field>
-                    <v-btn type="submit" color="primary" class="mt-4">Create ToDo</v-btn>
-                </v-form>
+<!--                <v-row align="center" class="mb-4">-->
+<!--                    <v-spacer></v-spacer>-->
+<!--                    <v-col cols="12" sm="4" class="text-right">-->
+<!--                        <v-btn color="primary" @click="navigateToCreate">-->
+<!--                            Create New ToDo-->
+<!--                        </v-btn>-->
+<!--                    </v-col>-->
+<!--                </v-row>-->
+<!--                <h2 class="text-h5 mb-3">Create New ToDo</h2>-->
+<!--                <v-form @submit.prevent="submitForm">-->
+<!--                    <v-text-field v-model="newTodo.title" label="Title" required></v-text-field>-->
+<!--                    <v-textarea v-model="newTodo.description" label="Description" required></v-textarea>-->
+<!--                    <v-text-field v-model="dueDateInput" label="Due Date" type="datetime-local" required></v-text-field>-->
+<!--                    <v-select-->
+<!--                        v-model="newTodo.assigneeIdList"-->
+<!--                        :items="assigneeItems"-->
+<!--                        item-text="name"-->
+<!--                        item-value="id"-->
+<!--                        label="Assignees"-->
+<!--                        multiple-->
+<!--                        chips-->
+<!--                    >-->
+<!--                        <template v-slot:selection="{ item }">-->
+<!--                            <v-chip>{{ item.name }}</v-chip>-->
+<!--                        </template>-->
+<!--                    </v-select>-->
+<!--                    <v-text-field v-model="newTodo.category" label="Category"></v-text-field>-->
+<!--                    <v-btn type="submit" color="primary" class="mt-4">Create ToDo</v-btn>-->
+<!--                </v-form>-->
 
-                <h2 class="text-h5 mb-3 mt-6">Completed ToDos</h2>
+                <h2 class="text-h5 mb-3">Completed ToDos</h2>
                 <v-alert v-if="completedTodos.length === 0" type="warning" class="mb-4">
                     No completed ToDos available or match the filter...
                 </v-alert>
                 <v-row v-else>
-                    <v-col v-for="todo in completedTodos" :key="todo.id" cols="12" sm="6" md="4">
+                    <v-col v-for="todo in completedTodos" :key="todo.id" cols="12" sm="6" md="12">
                         <v-card class="completed">
                             <v-card-title>
                                 <v-checkbox v-model="todo.finished" @change="updateToDoStatus(todo)" class="mr-2"></v-checkbox>
@@ -88,7 +111,7 @@
                             </v-card-title>
                             <v-card-text>
                                 <p>ID: {{ todo.id }}</p>
-                                <p>{{ todo.description }}</p>
+                                <p class="text-truncate">{{ todo.description }}</p>
                                 <p>Completed Date: {{ new Date(todo.completedDate as string).toLocaleDateString() }}</p>
                                 <p>Assigned to: {{ getAssigneesForTodo(todo) }}</p>
                                 <p>Category: {{ todo.category }}</p>
@@ -244,6 +267,10 @@ function navigateToCreate() {
     router.push('/create-todo');
 }
 
+function navigateToSearch() {
+    router.push('/todo-by-id');
+}
+
 function getAssigneesForTodo(todo: ToDo): string {
     if (!todo.assigneeList?.length) {
         return "No assignees";
@@ -295,5 +322,21 @@ onMounted(async () => {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.custom-btn {
+    background-color: white !important;
+    color: #1976D2 !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+.custom-btn:hover {
+    background-color: #daebff !important;
+    color: #1976D2 !important;
+}
+
+.custom-btn::before {
+    display: none;
 }
 </style>

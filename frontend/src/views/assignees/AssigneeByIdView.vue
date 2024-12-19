@@ -12,7 +12,7 @@
                 ></v-text-field>
             </v-col>
             <v-col cols="12" sm="4">
-                <v-btn @click="fetchAssignee" color="primary" block height="56">
+                <v-btn class="custom-btn" @click="fetchAssignee" color="primary" block height="56">
                     Fetch Assignee
                 </v-btn>
             </v-col>
@@ -100,3 +100,27 @@ function editAssignee() {
     }
 }
 </script>
+
+<style scoped>
+.text-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.custom-btn {
+    background-color: white !important;
+    color: #1976D2 !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+.custom-btn:hover {
+    background-color: #daebff !important;
+    color: #1976D2 !important;
+}
+
+.custom-btn::before {
+    display: none;
+}
+</style>

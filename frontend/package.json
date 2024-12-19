@@ -16,6 +16,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.4.2",
     "@fortawesome/vue-fontawesome": "^3.0.3",
     "@mdi/font": "^7.4.47",
+    "@mdi/js": "^7.4.47",
     "agnostic-vue": "^1.1.3",
     "file-saver": "^2.0.5",
     "marked": "^15.0.3",

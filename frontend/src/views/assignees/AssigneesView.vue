@@ -41,13 +41,30 @@ function navigateToCreate() {
     router.push('/create-assignee');
 }
 
+function navigateToSearch() {
+    router.push('/assignee-by-id');
+}
+
+
 onMounted(() => fetchAllAssignees());
 </script>
 
 <template>
     <v-container>
-        <h1 class="text-h4 mb-4">Assignees</h1>
-        <v-btn @click="navigateToCreate" color="primary" class="mb-4">Create New Assignee</v-btn>
+        <v-row align="center" class="mb-4">
+            <v-col cols="12" sm="3" class="text-right">
+                <v-btn class="custom-btn" color="primary" @click="navigateToCreate" block>
+                    <v-icon left>mdi-account-plus</v-icon> Create Assignee
+                </v-btn>
+            </v-col>
+            <v-spacer></v-spacer>
+            <v-col cols="12" sm="3">
+                <v-btn class="custom-btn" color="primary" @click="navigateToSearch" block>
+                    <v-icon left>mdi-magnify</v-icon> Search Assignee
+                </v-btn>
+            </v-col>
+        </v-row>
+<!--        <v-btn @click="navigateToCreate" color="primary" class="mb-4">Create New Assignee</v-btn>-->
 
         <v-alert v-if="assignees.length === 0" type="warning" class="mb-4">
             No assignees available on the server...
@@ -76,3 +93,27 @@ onMounted(() => fetchAllAssignees());
         </v-row>
     </v-container>
 </template>
+
+<style scoped>
+.text-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.custom-btn {
+    background-color: white !important;
+    color: #1976D2 !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+.custom-btn:hover {
+    background-color: #daebff !important;
+    color: #1976D2 !important;
+}
+
+.custom-btn::before {
+    display: none;
+}
+</style>

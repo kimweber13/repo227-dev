@@ -19,9 +19,9 @@
                 required
             ></v-text-field>
             <v-row align="center" class="mb-2">
-                <v-btn color="primary" class="mt-4" @click="navigateBack">Back</v-btn>
+                <v-btn class="custom-btn" color="primary"  @click="navigateBack">Back</v-btn>
                 <v-spacer></v-spacer>
-                <v-btn type="submit" color="primary" class="mt-4">
+                <v-btn class="custom-btn" type="submit" color="primary" >
                     {{ isEditing ? 'Update' : 'Create' }} Assignee
                 </v-btn>
             </v-row>
@@ -91,3 +91,28 @@ function navigateBack() {
     router.push('/assignees');
 }
 </script>
+
+<style scoped>
+.text-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.custom-btn {
+    background-color: white !important;
+    color: #1976D2 !important;
+    box-shadow: none !important;
+    border: none !important;
+    margin-top: 18px !important;
+}
+
+.custom-btn:hover {
+    background-color: #daebff !important;
+    color: #1976D2 !important;
+}
+
+.custom-btn::before {
+    display: none;
+}
+</style>
