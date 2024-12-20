@@ -74,7 +74,7 @@ function exportToCsv() {
             <v-icon :icon="snackbarIcon" class="mr-2"></v-icon>
             {{ exportStatus }}
             <template v-slot:actions>
-                <v-btn color="white" text @click="showSnackbar = false">
+                <v-btn color="white" @click="showSnackbar = false">
                     Close
                 </v-btn>
             </template>
