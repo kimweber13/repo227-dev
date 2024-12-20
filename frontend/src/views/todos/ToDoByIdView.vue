@@ -45,6 +45,10 @@
                 </v-btn>
             </v-card-actions>
         </v-card>
+        <v-row align="center" class="mb-2">
+            <v-btn color="primary" class="custom-btn" @click="navigateBack">Back</v-btn>
+            <v-spacer></v-spacer>
+        </v-row>
     </v-container>
 </template>
 
@@ -156,6 +160,10 @@ async function updateToDoStatus(todo: ToDo) {
     } catch (error) {
         showToast(new Toast("Error", "Failed to update todo status", "error", faXmark));
     }
+}
+
+function navigateBack() {
+    router.push('/todos');
 }
 </script>
 

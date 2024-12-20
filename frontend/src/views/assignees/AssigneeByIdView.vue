@@ -38,6 +38,11 @@
                 </v-btn>
             </v-card-actions>
         </v-card>
+        <v-row align="center" class="mb-2">
+            <v-btn class="custom-btn" color="primary"  @click="navigateBack">Back</v-btn>
+            <v-spacer></v-spacer>
+
+        </v-row>
     </v-container>
 </template>
 
@@ -98,6 +103,10 @@ function editAssignee() {
     if (assignee.value) {
         router.push(`/assignees/${assignee.value.id}/edit`);
     }
+}
+
+function navigateBack() {
+    router.push('/assignees');
 }
 </script>
 
