@@ -68,7 +68,7 @@ onMounted(() => fetchAllAssignees());
             No assignees available on the server...
         </v-alert>
         <v-row v-else>
-            <v-col v-for="assignee in assignees" :key="assignee.id" cols="12" sm="6" md="4">
+            <v-col v-for="assignee in assignees" :key="assignee.id" cols="12" sm="6" md="6">
                 <v-card>
                     <v-card-title>{{ assignee.prename }} {{ assignee.name }}</v-card-title>
                     <v-card-text>
