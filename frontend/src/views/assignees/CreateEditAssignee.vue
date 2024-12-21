@@ -1,27 +1,37 @@
 <template>
+    <!-- Container for the form -->
     <v-container>
+        <!-- Header displaying the form title based on the editing state -->
         <h1 class="text-h4 mb-4">{{ isEditing ? 'Edit' : 'Create' }} Assignee</h1>
+        <!-- Form for creating or editing an assignee -->
         <v-form @submit.prevent="submitForm">
+            <!-- Input field for the first name of the assignee -->
             <v-text-field
                 v-model="assignee.prename"
                 label="First Name"
                 required
             ></v-text-field>
+            <!-- Input field for the last name of the assignee -->
             <v-text-field
                 v-model="assignee.name"
                 label="Last Name"
                 required
             ></v-text-field>
+            <!-- Input field for the email of the assignee -->
             <v-text-field
                 v-model="assignee.email"
                 label="Email"
                 type="email"
                 required
             ></v-text-field>
+            <!-- Row for the form buttons -->
             <v-row align="center" class="mb-2">
-                <v-btn class="custom-btn" color="primary"  @click="navigateBack">Back</v-btn>
+                <!-- Button to navigate back to the previous page -->
+                <v-btn class="custom-btn" color="primary" @click="navigateBack">Back</v-btn>
+                <!-- Spacer to separate the buttons -->
                 <v-spacer></v-spacer>
-                <v-btn class="custom-btn" type="submit" color="primary" >
+                <!-- Button to submit the form, displaying 'Update' or 'Create' based on the editing state -->
+                <v-btn class="custom-btn" type="submit" color="primary">
                     {{ isEditing ? 'Update' : 'Create' }} Assignee
                 </v-btn>
             </v-row>
@@ -59,6 +69,13 @@ onMounted(() => {
     }
 });
 
+/**
+ * Fetches the assignee data from the server based on the route parameter ID.
+ *
+ * This function sends a GET request to the server to retrieve the assignee data.
+ * On success, it updates the `assignee` ref with the fetched data.
+ * On failure, it shows an error toast notification.
+ */
 function fetchAssignee() {
     fetch(`${config.apiBaseUrl}/assignees/${route.params.id}`)
         .then(response => response.json())
@@ -68,6 +85,14 @@ function fetchAssignee() {
         .catch(error => showToast(new Toast('Error', error.message, 'error', faXmark)));
 }
 
+/**
+ * Submits the form data to create or update an assignee.
+ *
+ * This function determines the appropriate URL and HTTP method based on the editing state.
+ * It sends a POST request to create a new assignee or a PUT request to update an existing assignee.
+ * On success, it shows a success toast notification and navigates back to the assignees list.
+ * On failure, it shows an error toast notification.
+ */
 function submitForm() {
     const url = isEditing.value
         ? `${config.apiBaseUrl}/assignees/${route.params.id}`
@@ -87,6 +112,11 @@ function submitForm() {
         .catch(error => showToast(new Toast('Error', error.message, 'error', faXmark)));
 }
 
+/**
+ * Navigates back to the assignees list.
+ *
+ * This function uses the router to navigate back to the assignees list page.
+ */
 function navigateBack() {
     router.push('/assignees');
 }

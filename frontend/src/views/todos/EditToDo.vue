@@ -1,25 +1,34 @@
 <template>
+    <!-- Container for the Edit ToDo view -->
     <v-container>
+        <!-- Header for the Edit ToDo form -->
         <h1 class="text-h4 mb-4">Edit ToDo</h1>
+        <!-- Form for editing an existing ToDo -->
         <v-form @submit.prevent="submitForm">
+            <!-- Input field for the ToDo title -->
             <v-text-field
                 v-model="todo.title"
                 label="Title"
                 required
             ></v-text-field>
+            <!-- Textarea for the ToDo description -->
             <v-textarea
                 v-model="todo.description"
                 label="Description"
                 required
             ></v-textarea>
+            <!-- Input field for the ToDo due date -->
             <v-text-field
                 v-model="dueDateInput"
                 label="Due Date"
                 type="datetime-local"
                 required
             ></v-text-field>
+            <!-- Card containing the list of assignees -->
             <v-card class="mb-4">
+                <!-- Card title for assignees section -->
                 <v-card-title>Assignees</v-card-title>
+                <!-- Card text containing checkboxes for each assignee -->
                 <v-card-text>
                     <v-checkbox
                         v-for="assignee in assignees"
@@ -30,13 +39,17 @@
                     ></v-checkbox>
                 </v-card-text>
             </v-card>
+            <!-- Checkbox for marking the ToDo as finished -->
             <v-checkbox
                 v-model="todo.finished"
                 label="Finished"
             ></v-checkbox>
+            <!-- Row containing the back and submit buttons -->
             <v-row align="center" class="mb-2">
+                <!-- Button to navigate back to the previous page -->
                 <v-btn color="primary" class="custom-btn" @click="navigateBack">Back</v-btn>
                 <v-spacer></v-spacer>
+                <!-- Button to submit the form and update the ToDo -->
                 <v-btn type="submit" color="primary" class="custom-btn">Update ToDo</v-btn>
             </v-row>
         </v-form>
@@ -187,6 +200,11 @@ function submitForm() {
         .catch(error => showToast(new Toast('Error', error.message, 'error', faXmark)));
 }
 
+/**
+ * Navigates back to the ToDo list.
+ *
+ * This function uses the router to navigate back to the ToDo list page.
+ */
 function navigateBack() {
     router.push('/todos');
 }

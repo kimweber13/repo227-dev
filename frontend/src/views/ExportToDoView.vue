@@ -1,7 +1,11 @@
 <template>
+    <!-- Container for the Export ToDos view -->
     <div class="export-container">
+        <!-- Header for the Export ToDos section -->
         <h1>Export ToDos</h1>
+        <!-- Button to trigger the export to CSV function -->
         <Button @click="exportToCsv" class="export-button" :disabled="isExporting">
+            <!-- Button text changes based on the exporting state -->
             {{ isExporting ? 'Exporting...' : 'Export ToDos as CSV' }}
         </Button>
     </div>
@@ -29,6 +33,13 @@ interface ToDo {
 const todos = ref<ToDo[]>([]);
 const isExporting = ref(false);
 
+/**
+ * Fetches all ToDos from the server.
+ *
+ * This function sends a GET request to the server to retrieve all ToDos.
+ * On success, it updates the `todos` ref with the fetched data.
+ * On failure, it shows an error toast notification.
+ */
 function fetchAllToDos() {
     fetch(`${config.apiBaseUrl}/todos`)
         .then(response => response.json())
@@ -38,6 +49,15 @@ function fetchAllToDos() {
         .catch(error => showToast(new Toast("Error", error.message, "error", faXmark)));
 }
 
+/**
+ * Exports all ToDos to a CSV file.
+ *
+ * This function sends a GET request to the server to export all ToDos as a CSV file.
+ * If there are no ToDos available to export, it shows a warning toast notification.
+ * On success, it triggers a download of the CSV file and shows a success toast notification.
+ * On failure, it shows an error toast notification.
+ * The exporting state is managed using the `isExporting` ref.
+ */
 function exportToCsv() {
     if (todos.value.length === 0) {
         showToast(new Toast("Warning", "No ToDos available to export", "warning", faXmark));

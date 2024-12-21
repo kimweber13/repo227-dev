@@ -1,25 +1,34 @@
 <template>
+    <!-- Container for the Create ToDo view -->
     <v-container>
+        <!-- Header for the Create ToDo form -->
         <h1 class="text-h4 mb-4">Create ToDo</h1>
+        <!-- Form for creating a new ToDo -->
         <v-form @submit.prevent="submitForm">
+            <!-- Input field for the ToDo title -->
             <v-text-field
                 v-model="todo.title"
                 label="Title"
                 required
             ></v-text-field>
+            <!-- Textarea for the ToDo description -->
             <v-textarea
                 v-model="todo.description"
                 label="Description"
                 required
             ></v-textarea>
+            <!-- Input field for the ToDo due date -->
             <v-text-field
                 v-model="dueDateInput"
                 label="Due Date"
                 type="datetime-local"
                 required
             ></v-text-field>
+            <!-- Card containing the list of assignees -->
             <v-card class="mb-4">
+                <!-- Card title for assignees section -->
                 <v-card-title>Assignees</v-card-title>
+                <!-- Card text containing checkboxes for each assignee -->
                 <v-card-text>
                     <v-checkbox
                         v-for="assignee in assignees"
@@ -30,12 +39,14 @@
                     ></v-checkbox>
                 </v-card-text>
             </v-card>
+            <!-- Row containing the back and submit buttons -->
             <v-row align="center" class="mb-2">
+                <!-- Button to navigate back to the previous page -->
                 <v-btn color="primary" class="custom-btn" @click="navigateBack">Back</v-btn>
                 <v-spacer></v-spacer>
+                <!-- Button to submit the form and create the ToDo -->
                 <v-btn type="submit" color="primary" class="custom-btn">Create ToDo</v-btn>
             </v-row>
-
         </v-form>
     </v-container>
 </template>
@@ -74,6 +85,13 @@ const dueDateTimestamp = computed(() => {
     return new Date(dueDateInput.value).getTime();
 });
 
+/**
+ * Fetches the list of assignees from the server.
+ *
+ * This function sends a GET request to the server to retrieve the list of assignees.
+ * On success, it updates the `assignees` ref with the fetched data.
+ * On failure, it shows an error toast notification.
+ */
 function fetchAssignees() {
     fetch(`${config.apiBaseUrl}/assignees`)
         .then(response => response.json())
@@ -83,10 +101,22 @@ function fetchAssignees() {
         .catch(error => showToast(new Toast('Error', error.message, 'error', faXmark)));
 }
 
+/**
+ * Lifecycle hook that is called when the component is mounted.
+ *
+ * This function calls `fetchAssignees` to load the list of assignees when the component is mounted.
+ */
 onMounted(() => {
     fetchAssignees();
 });
 
+/**
+ * Submits the form data to create a new ToDo.
+ *
+ * This function constructs the ToDo object with the form data and sends a POST request to the server.
+ * On success, it shows a success toast notification and navigates back to the ToDo list.
+ * On failure, it shows an error toast notification.
+ */
 function submitForm() {
     const todoToSubmit = {
         ...todo.value,
@@ -105,6 +135,11 @@ function submitForm() {
         .catch(error => showToast(new Toast('Error', error.message, 'error', faXmark)));
 }
 
+/**
+ * Navigates back to the ToDo list.
+ *
+ * This function uses the router to navigate back to the ToDo list page.
+ */
 function navigateBack() {
     router.push('/todos');
 }
