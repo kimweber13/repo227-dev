@@ -66,6 +66,10 @@ public class ToDoService {
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ToDo not found"));
         validateToDoDTO(dto);
         updateToDoFromDTO(todo, dto);
+
+        String category = todoModel.predictClass(dto.getTitle());
+        todo.setCategory(category);
+
         return toDoRepository.save(todo);
     }
 

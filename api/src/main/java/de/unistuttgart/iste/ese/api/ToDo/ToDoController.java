@@ -90,10 +90,10 @@ public class ToDoController {
     @DeleteMapping("/todos/{id}")
     public ResponseEntity<Void> deleteToDo(@PathVariable Long id) {
         toDoService.deleteToDo(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
-    @GetMapping(value = "/todos/export", produces = "text/csv")
+    @GetMapping(value = "/csv-downloads/todos", produces = "text/csv")
     public void exportToCsv(HttpServletResponse response) throws IOException {
         response.setContentType("text/csv");
         response.setHeader("Content-Disposition", "attachment; filename=\"todos.csv\"");
@@ -107,8 +107,8 @@ public class ToDoController {
                     todo.getId(),
                     todo.getTitle(),
                     todo.getDescription(),
-                    todo.isFinished() ? "Completed" : "Active",
-                    String.join(", ", todo.getAssigneeList().stream()
+                    todo.isFinished() ? "TRUE" : "FALSE",  // Geändert von "Completed"/"Active" zu "TRUE"/"FALSE"
+                    String.join("+", todo.getAssigneeList().stream()  // Geändert von ", " zu "+"
                         .map(assignee -> assignee.getPrename() + " " + assignee.getName())
                         .collect(Collectors.toList())),
                     formatDate(todo.getCreatedDate(), formatter),
@@ -119,6 +119,7 @@ public class ToDoController {
             }
         }
     }
+
 
 
     private String formatDate(Long timestamp, DateTimeFormatter formatter) {
