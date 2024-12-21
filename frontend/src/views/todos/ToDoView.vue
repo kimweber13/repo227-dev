@@ -398,7 +398,7 @@ function getAssigneesForTodo(todo: ToDo): string {
  *
  * This function toggles the sort order (ascending/descending) for the specified field.
  * If the field is already being sorted, it reverses the sort order.
- * Otherwise, it sets the sort order to ascending for the new field.
+ * Otherwise, it sets the sort order to an ascending order for the new field.
  *
  * @param {'title' | 'dueDate'} field - The field to sort by.
  */
