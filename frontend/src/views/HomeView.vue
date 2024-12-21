@@ -1,56 +1,83 @@
-<script setup lang="ts">
-import {Button} from "agnostic-vue";
-import {showToast, Toast} from "@/ts/toasts";
-
-let name = "";
-
-function submit() {
-  showToast(new Toast("Welcome!", `Hello ${name}! Nice to meet you!`));
-}
-</script>
-
 <template>
-  <main>
-    <h1>Welcome to Your Vue.js App</h1>
-    <label class="mbs2 mbe2" >Type your name:</label>
-    <br/>
-    <input type="text" class="mbs2 mbe2" v-model="name"/>
-    <br/>
-    <Button class="mbs2 mbe2" @click="submit">Submit</Button>
-  </main>
+    <v-container>
+        <v-card class="mx-auto" max-width="800">
+            <v-card-title class="text-h4 text-center">
+                Welcome to the <v-icon>mdi-checkbox-marked-circle-outline</v-icon> ToDo List App
+            </v-card-title>
+
+            <v-card-text class="text-center">
+                <p class="text-h6 mb-4">
+                    {{ currentDateTime }}
+                </p>
+                <p class="text-h6 mb-6">
+                    Active ToDos: {{ activeTodoCount }}
+                </p>
+                <v-btn
+                    class="custom-btn"
+                    @click="navigateToTodos"
+                    size="large"
+                >
+                    Get Started
+                </v-btn>
+            </v-card-text>
+        </v-card>
+        <v-row class="mt-12">
+            <v-col class="text-center text-caption">
+                Version v0.4 by Kim Weber
+            </v-col>
+        </v-row>
+    </v-container>
 </template>
 
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import config from "@/config";
+
+const router = useRouter();
+const currentDateTime = ref('');
+const activeTodoCount = ref(0);
+
+function updateDateTime() {
+    const now = new Date();
+    currentDateTime.value = now.toLocaleString();
+}
+
+function fetchActiveTodoCount() {
+    fetch(`${config.apiBaseUrl}/todos`)
+        .then(response => response.json())
+        .then(data => {
+            activeTodoCount.value = data.filter(todo => !todo.finished).length;
+        })
+        .catch(error => console.error('Error fetching todos:', error));
+}
+
+function navigateToTodos() {
+    router.push('/todos');
+}
+
+onMounted(() => {
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+    fetchActiveTodoCount();
+    setInterval(fetchActiveTodoCount, 5000);
+});
+</script>
+
 <style scoped>
-main{
-  max-width: 600px;
-  margin: auto;
-  padding-top: 0.5rem;
-  text-align: center;
+.custom-btn {
+    background-color: white !important;
+    color: #1976D2 !important;
+    box-shadow: none !important;
+    border: none !important;
 }
 
-input[type=text]{
-  width: 100%;
-  padding: 0.5rem;
-  border-radius: 0.25rem;
-  border: 0.1rem solid #ccc;
+.custom-btn:hover {
+    background-color: #daebff !important;
+    color: #1976D2 !important;
 }
 
-input[type=text]:focus{
-  outline: none;
-  border-color: #3498db;
-}
-
-button{
-  background-color: #3498db;
-  color: white;
-  border-radius: 0.25rem;
-  border: none;
-  padding: 0.5rem 0.75rem;
-  transition: background-color 0.3s ease;
-  cursor: pointer;
-}
-
-button:hover{
-  background-color: #2980b9;
+.custom-btn::before {
+    display: none;
 }
 </style>
