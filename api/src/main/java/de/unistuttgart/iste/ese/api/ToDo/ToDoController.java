@@ -93,6 +93,15 @@ public class ToDoController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Exports all ToDos to a CSV file.
+     *
+     * This method sets the response content type and header for CSV download,
+     * retrieves all ToDos, formats the data, and writes it to the response output stream.
+     *
+     * @param response The HttpServletResponse to write the CSV data to
+     * @throws IOException if an I/O error occurs
+     */
     @GetMapping(value = "/csv-downloads/todos", produces = "text/csv")
     public void exportToCsv(HttpServletResponse response) throws IOException {
         response.setContentType("text/csv");
@@ -122,6 +131,13 @@ public class ToDoController {
 
 
 
+    /**
+     * Formats a timestamp into a date string using the specified formatter.
+     *
+     * @param timestamp The timestamp to format, in milliseconds since epoch
+     * @param formatter The DateTimeFormatter to use for formatting the date
+     * @return The formatted date string, or an empty string if the timestamp is null
+     */
     private String formatDate(Long timestamp, DateTimeFormatter formatter) {
         if (timestamp == null) {
             return "";
