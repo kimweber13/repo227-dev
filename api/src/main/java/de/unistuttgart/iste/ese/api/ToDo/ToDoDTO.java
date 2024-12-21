@@ -134,10 +134,19 @@ public class ToDoDTO {
         this.assigneeIdList = assigneeIdList;
     }
 
+    /**
+     * Gets the category of the ToDo.
+     *
+     * @return The ToDo's category
+     */
     public String getCategory() {
         return category;
     }
-
+    /**
+     * Sets the category of the ToDo.
+     *
+     * @param category The category to set
+     */
     public void setCategory(String category) {
         this.category = category;
     }
