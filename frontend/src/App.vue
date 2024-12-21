@@ -19,7 +19,7 @@ const showSnackbar = computed({
 function exportToCsv() {
     isExporting.value = true;
     exportStatus.value = 'Exporting...';
-    fetch(`${config.apiBaseUrl}/todos/export`, {
+    fetch(`${config.apiBaseUrl}/csv-downloads/todos`, {
         method: 'GET',
         headers: {
             'Accept': 'text/csv'
