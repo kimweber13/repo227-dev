@@ -186,12 +186,17 @@ public class ToDo {
      */
     public void setFinishedDate(Long finishedDate) { this.finishedDate = finishedDate; }
 
-    // Getter und Setter für das neue Feld
-    public String getCategory() {
-        return category;
-    }
 
-    public void setCategory(String category) {
-        this.category = category;
-    }
+    /**
+     * Gets the category of the ToDo.
+     *
+     * @return The category of the ToDo
+     */
+    public String getCategory() { return category; }
+    /**
+     * Sets the category of the ToDo.
+     *
+     * @param category The category to set
+     */
+    public void setCategory(String category) { this.category = category; }
 }
