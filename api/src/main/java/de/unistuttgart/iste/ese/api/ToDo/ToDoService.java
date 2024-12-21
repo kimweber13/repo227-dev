@@ -37,20 +37,15 @@ public class ToDoService {
         ToDo todo = new ToDo();
         updateToDoFromDTO(todo, dto);
 
-        // Classify the Todo title
-        String category = todoModel.predictClass(dto.getTitle());
-        todo.setCategory(category);
-
+        try {
+            String category = todoModel.predictClass(dto.getTitle());
+            todo.setCategory(category);
+        } catch (Exception e) {
+            // Setzen Sie einen Standardwert, wenn die Kategorisierung fehlschlägt
+            todo.setCategory("work");
+        }
         return toDoRepository.save(todo);
     }
-
-
-    /*public ToDo createToDo(ToDoDTO dto) {
-        validateToDoDTO(dto);
-        ToDo todo = new ToDo();
-        updateToDoFromDTO(todo, dto);
-        return toDoRepository.save(todo);
-    }*/
 
     /**
      * Updates an existing ToDo based on the provided DTO.
@@ -67,9 +62,15 @@ public class ToDoService {
         validateToDoDTO(dto);
         updateToDoFromDTO(todo, dto);
 
-        String category = todoModel.predictClass(dto.getTitle());
-        todo.setCategory(category);
-
+        try {
+            String category = todoModel.predictClass(dto.getTitle());
+            todo.setCategory(category);
+        } catch (Exception e) {
+            // Behalte die existierende Kategorie bei, wenn die Vorhersage fehlschlägt
+            if (todo.getCategory() == null) {
+                todo.setCategory("work");
+            }
+        }
         return toDoRepository.save(todo);
     }
 
