@@ -81,7 +81,7 @@ function updateDateTime() {
 function fetchActiveTodoCount() {
     fetch(`${config.apiBaseUrl}/todos`)
         .then(response => response.json())
-        .then(data => {
+        .then((data: { finished: boolean }[]) => {
             activeTodoCount.value = data.filter(todo => !todo.finished).length;
         })
         .catch(error => console.error('Error fetching todos:', error));

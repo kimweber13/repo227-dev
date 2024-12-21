@@ -67,7 +67,7 @@ function fetchActiveTodoCount() {
     fetch(`${config.apiBaseUrl}/todos`)
         .then(response => response.json())
         .then(data => {
-            activeTodoCount.value = data.filter(todo => !todo.finished).length;
+            activeTodoCount.value = data.filter((todo: { finished: boolean }) => !todo.finished).length;
         })
         .catch(error => console.error('Error fetching todos:', error));
 }
