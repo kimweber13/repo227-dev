@@ -128,12 +128,19 @@ function submitForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(todoToSubmit),
     })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to create todo');
+            }
+            return response.json();
+        })
         .then(() => {
             showToast(new Toast('Success', 'ToDo created successfully!', 'success', faCheck));
             router.push('/todos');
         })
-        .catch(error => showToast(new Toast('Error', error.message, 'error', faXmark)));
+        .catch(error => showToast(new Toast('Error', `Failed to create todo: ${error.message}`, 'error', faXmark)));
 }
+
 
 /**
  * Navigates back to the ToDo list.

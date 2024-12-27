@@ -266,12 +266,18 @@ const createTodoPanel = ref([0]);
  */
 function fetchAllToDos() {
     fetch(`${config.apiBaseUrl}/todos`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch todos');
+            }
+            return response.json();
+        })
         .then(data => {
             todos.value = data;
         })
-        .catch(error => showToast(new Toast("Error", error.message, "error", faXmark)));
+        .catch(error => showToast(new Toast("Error", "Failed to load todos: " + error.message, "error", faXmark)));
 }
+
 
 /**
  * Fetches all assignees from the server.
@@ -282,11 +288,16 @@ function fetchAllToDos() {
  */
 function fetchAssignees() {
     fetch(`${config.apiBaseUrl}/assignees`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch assignees');
+            }
+            return response.json();
+        })
         .then(data => {
             assignees.value = data;
         })
-        .catch(error => showToast(new Toast("Error", error.message, "error", faXmark)));
+        .catch(error => showToast(new Toast("Error", "Failed to load assignees: " + error.message, "error", faXmark)));
 }
 
 /**
@@ -431,7 +442,12 @@ function submitForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(todoToSubmit),
     })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to create todo');
+            }
+            return response.json();
+        })
         .then(data => {
             todos.value.push(data);
             showToast(new Toast('Success', 'ToDo created successfully!', 'success', faCheck));

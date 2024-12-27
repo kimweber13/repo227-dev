@@ -141,11 +141,6 @@ function fetchToDo() {
     }
 }
 
-onMounted(() => {
-    fetchAssignees();
-    fetchToDo();
-});
-
 /**
  * Toggles the inclusion of an assignee in the ToDo item's assignee list.
  * If the assignee is not in the list, they are added.
@@ -170,7 +165,6 @@ function toggleAssignee(assigneeId: number) {
  * Displays an error toast message if the request fails.
  */
 function submitForm() {
-    // Korrigierte Zeitzonenbehandlung beim Submit
     const inputDate = new Date(dueDateInput.value);
     const offset = inputDate.getTimezoneOffset() * 60000;
 
@@ -179,7 +173,7 @@ function submitForm() {
         description: todo.value.description,
         finished: todo.value.finished,
         assigneeIdList: todo.value.assigneeIdList,
-        dueDate: inputDate.getTime() + offset // Korrektur der Zeitzone
+        dueDate: inputDate.getTime() + offset
     };
 
     fetch(`${config.apiBaseUrl}/todos/${route.params.id}`, {
@@ -189,7 +183,7 @@ function submitForm() {
     })
         .then(response => {
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error(`Failed to update todo: ${response.statusText}`);
             }
             return response.json();
         })
@@ -208,6 +202,12 @@ function submitForm() {
 function navigateBack() {
     router.push('/todos');
 }
+
+onMounted(() => {
+    fetchAssignees();
+    fetchToDo();
+});
+
 </script>
 
 <style scoped>

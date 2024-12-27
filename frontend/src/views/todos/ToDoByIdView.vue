@@ -110,6 +110,7 @@ const error = ref<string | null>(null);
 function fetchToDo() {
     if (!searchId.value) {
         error.value = "Please enter a ToDo ID";
+        showToast(new Toast("Error", "Please enter a ToDo ID", "error", faXmark));
         return;
     }
 
@@ -123,12 +124,15 @@ function fetchToDo() {
         .then(data => {
             todo.value = data;
             error.value = null;
+            showToast(new Toast("Success", "ToDo found successfully!", "success", faCheck));
         })
         .catch(err => {
             error.value = err.message;
             todo.value = null;
+            showToast(new Toast("Error", `Failed to fetch todo: ${err.message}`, "error", faXmark));
         });
 }
+
 
 /**
  * Deletes the currently fetched ToDo.
