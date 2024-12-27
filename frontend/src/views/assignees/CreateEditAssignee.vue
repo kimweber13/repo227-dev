@@ -104,7 +104,12 @@ function submitForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(assignee.value),
     })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Failed to ${isEditing.value ? 'update' : 'create'} assignee`);
+            }
+            return response.json();
+        })
         .then(() => {
             showToast(new Toast('Success', `Assignee ${isEditing.value ? 'updated' : 'created'} successfully!`, 'success', faCheck));
             router.push('/assignees');

@@ -91,6 +91,7 @@ const error = ref<string | null>(null);
 function fetchAssignee() {
     if (!searchId.value) {
         error.value = "Please enter an Assignee ID";
+        showToast(new Toast("Error", "Please enter an Assignee ID", "error", faXmark));
         return;
     }
 
@@ -104,10 +105,12 @@ function fetchAssignee() {
         .then(data => {
             assignee.value = data;
             error.value = null;
+            showToast(new Toast("Success", "Assignee found successfully!", "success", faCheck));
         })
         .catch(err => {
             error.value = err.message;
             assignee.value = null;
+            showToast(new Toast("Error", `Failed to fetch assignee: ${err.message}`, "error", faXmark));
         });
 }
 
@@ -122,11 +125,14 @@ function deleteAssignee() {
     if (!assignee.value) return;
 
     fetch(`${config.apiBaseUrl}/assignees/${assignee.value.id}`, { method: "DELETE" })
-        .then(() => {
-            showToast(new Toast("Alert", `Successfully deleted Assignee with ID ${assignee.value?.id}!`, "success", faCheck));
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to delete assignee');
+            }
+            showToast(new Toast("Success", `Successfully deleted Assignee with ID ${assignee.value?.id}!`, "success", faCheck));
             assignee.value = null;
         })
-        .catch(error => showToast(new Toast("Error", error.message, "error", faXmark)));
+        .catch(error => showToast(new Toast("Error", `Failed to delete assignee: ${error.message}`, "error", faXmark)));
 }
 
 /**

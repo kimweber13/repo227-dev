@@ -323,6 +323,7 @@ async function updateToDoStatus(todo: ToDo) {
             throw new Error('Failed to update todo status');
         }
         todo.completedDate = updateData.completedDate;
+        showToast(new Toast("Success", `ToDo status successfully ${todo.finished ? 'completed' : 'reactivated'}!`, "success", faCheck));
     } catch (error) {
         showToast(new Toast("Error", "Failed to update todo status", "error", faXmark));
     }

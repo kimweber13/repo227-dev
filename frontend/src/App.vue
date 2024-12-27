@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router';
 import { ref, computed } from 'vue';
+import { activeToasts } from '@/ts/toasts';
 import { saveAs } from 'file-saver';
 import config from "@/config";
 import { mdiCheckCircle, mdiAlertCircle, mdiHome } from '@mdi/js';
@@ -105,6 +106,26 @@ function exportToCsv() {
                 </v-btn>
             </template>
         </v-snackbar>
+        <div class="toast-container">
+            <v-snackbar
+                v-for="toast in activeToasts"
+                :key="toast.key"
+                :model-value="true"
+                :color="toast.type"
+                :timeout="5000"
+                location="top right"
+            >
+                <div class="d-flex align-center">
+                    <v-icon class="mr-2">
+                        <font-awesome-icon :icon="toast.icon" />
+                    </v-icon>
+                    <div>
+                        <div class="text-subtitle-1 font-weight-medium">{{ toast.title }}</div>
+                        <div class="text-body-2">{{ toast.message }}</div>
+                    </div>
+                </div>
+            </v-snackbar>
+        </div>
     </v-app>
 </template>
 

@@ -42,11 +42,14 @@ function fetchAllAssignees() {
  */
 function deleteAssignee(id: number) {
     fetch(`${config.apiBaseUrl}/assignees/${id}`, { method: "DELETE" })
-        .then(() => {
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to delete assignee');
+            }
             assignees.value = assignees.value.filter((assignee) => assignee.id !== id);
-            showToast(new Toast("Alert", `Successfully deleted assignee with ID ${id}!`, "success", faCheck));
+            showToast(new Toast("Success", `Successfully deleted assignee with ID ${id}!`, "success", faCheck));
         })
-        .catch(error => showToast(new Toast("Error", error.message, "error", faXmark)));
+        .catch(error => showToast(new Toast("Error", `Failed to delete assignee: ${error.message}`, "error", faXmark)));
 }
 
 /**
