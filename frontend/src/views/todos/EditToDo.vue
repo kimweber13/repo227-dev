@@ -4,7 +4,7 @@
         <!-- Header for the Edit ToDo form -->
         <h1 class="text-h4 mb-4">Edit ToDo</h1>
         <!-- Form for editing an existing ToDo -->
-        <v-form @submit.prevent="submitForm">
+        <v-form @submit.prevent="submitFormEdit">
             <!-- Input field for the ToDo title -->
             <v-text-field
                 v-model="todo.title"
@@ -164,7 +164,7 @@ function toggleAssignee(assigneeId: number) {
  * Displays a success toast message and navigates to the ToDo list on success.
  * Displays an error toast message if the request fails.
  */
-function submitForm() {
+function submitFormEdit() {
     const inputDate = new Date(dueDateInput.value);
     const offset = inputDate.getTimezoneOffset() * 60000;
 

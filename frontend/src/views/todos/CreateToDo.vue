@@ -4,7 +4,7 @@
         <!-- Header for the Create ToDo form -->
         <h1 class="text-h4 mb-4">Create ToDo</h1>
         <!-- Form for creating a new ToDo -->
-        <v-form @submit.prevent="submitForm">
+        <v-form @submit.prevent="submitFormCreate">
             <!-- Input field for the ToDo title -->
             <v-text-field
                 v-model="todo.title"
@@ -117,7 +117,7 @@ onMounted(() => {
  * On success, it shows a success toast notification and navigates back to the ToDo list.
  * On failure, it shows an error toast notification.
  */
-function submitForm() {
+function submitFormCreate() {
     const todoToSubmit = {
         ...todo.value,
         dueDate: dueDateTimestamp.value
