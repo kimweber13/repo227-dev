@@ -1,3 +1,61 @@
+<template>
+    <!-- Container for the assignees view -->
+    <v-container>
+        <!-- Row containing buttons for creating and searching assignees -->
+        <v-row align="center" class="mb-4">
+            <!-- Column for the 'Create Assignee' button -->
+            <v-col cols="12" sm="3" class="text-right">
+                <!-- Button to navigate to the create assignee page -->
+                <v-btn class="custom-btn" color="primary" @click="navigateToCreate" block>
+                    <v-icon left>mdi-account-plus</v-icon> Create Assignee
+                </v-btn>
+            </v-col>
+            <!-- Spacer to separate the buttons -->
+            <v-spacer></v-spacer>
+            <!-- Column for the 'Search Assignee' button -->
+            <v-col cols="12" sm="3">
+                <!-- Button to navigate to the search assignee page -->
+                <v-btn class="custom-btn" color="primary" @click="navigateToSearch" block>
+                    <v-icon left>mdi-magnify</v-icon> Search Assignee
+                </v-btn>
+            </v-col>
+        </v-row>
+        <!-- Alert displayed when no assignees are available -->
+        <v-alert v-if="assignees.length === 0" type="warning" class="mb-4">
+            No assignees available on the server...
+        </v-alert>
+        <!-- Row containing cards for each assignee -->
+        <v-row v-else>
+            <!-- Column for each assignee card -->
+            <v-col v-for="assignee in assignees" :key="assignee.id" cols="12" sm="6" md="6">
+                <!-- Card displaying assignee details -->
+                <v-card>
+                    <!-- Card title displaying assignee's full name -->
+                    <v-card-title>{{ assignee.prename }} {{ assignee.name }}</v-card-title>
+                    <!-- Card text displaying assignee's ID and email -->
+                    <v-card-text>
+                        <p>ID: {{ assignee.id }}</p>
+                        <p>Email: {{ assignee.email }}</p>
+                    </v-card-text>
+                    <!-- Card actions containing buttons for deleting and editing the assignee -->
+                    <v-card-actions>
+                        <!-- Button to delete the assignee -->
+                        <v-btn @click="deleteAssignee(assignee.id)" color="error">
+                            <v-icon left>mdi-delete</v-icon>
+                            Delete
+                        </v-btn>
+                        <!-- Button to edit the assignee -->
+                        <v-btn @click="editAssignee(assignee.id)" color="warning">
+                            <v-icon left>mdi-pencil</v-icon>
+                            Edit
+                        </v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-col>
+        </v-row>
+    </v-container>
+</template>
+
 <script setup lang="ts">
 import config from "@/config";
 import { showToast, Toast } from "@/ts/toasts";
@@ -83,65 +141,8 @@ function navigateToSearch() {
 
 
 onMounted(() => fetchAllAssignees());
-</script>
 
-<template>
-    <!-- Container for the assignees view -->
-    <v-container>
-        <!-- Row containing buttons for creating and searching assignees -->
-        <v-row align="center" class="mb-4">
-            <!-- Column for the 'Create Assignee' button -->
-            <v-col cols="12" sm="3" class="text-right">
-                <!-- Button to navigate to the create assignee page -->
-                <v-btn class="custom-btn" color="primary" @click="navigateToCreate" block>
-                    <v-icon left>mdi-account-plus</v-icon> Create Assignee
-                </v-btn>
-            </v-col>
-            <!-- Spacer to separate the buttons -->
-            <v-spacer></v-spacer>
-            <!-- Column for the 'Search Assignee' button -->
-            <v-col cols="12" sm="3">
-                <!-- Button to navigate to the search assignee page -->
-                <v-btn class="custom-btn" color="primary" @click="navigateToSearch" block>
-                    <v-icon left>mdi-magnify</v-icon> Search Assignee
-                </v-btn>
-            </v-col>
-        </v-row>
-        <!-- Alert displayed when no assignees are available -->
-        <v-alert v-if="assignees.length === 0" type="warning" class="mb-4">
-            No assignees available on the server...
-        </v-alert>
-        <!-- Row containing cards for each assignee -->
-        <v-row v-else>
-            <!-- Column for each assignee card -->
-            <v-col v-for="assignee in assignees" :key="assignee.id" cols="12" sm="6" md="6">
-                <!-- Card displaying assignee details -->
-                <v-card>
-                    <!-- Card title displaying assignee's full name -->
-                    <v-card-title>{{ assignee.prename }} {{ assignee.name }}</v-card-title>
-                    <!-- Card text displaying assignee's ID and email -->
-                    <v-card-text>
-                        <p>ID: {{ assignee.id }}</p>
-                        <p>Email: {{ assignee.email }}</p>
-                    </v-card-text>
-                    <!-- Card actions containing buttons for deleting and editing the assignee -->
-                    <v-card-actions>
-                        <!-- Button to delete the assignee -->
-                        <v-btn @click="deleteAssignee(assignee.id)" color="error">
-                            <v-icon left>mdi-delete</v-icon>
-                            Delete
-                        </v-btn>
-                        <!-- Button to edit the assignee -->
-                        <v-btn @click="editAssignee(assignee.id)" color="warning">
-                            <v-icon left>mdi-pencil</v-icon>
-                            Edit
-                        </v-btn>
-                    </v-card-actions>
-                </v-card>
-            </v-col>
-        </v-row>
-    </v-container>
-</template>
+</script>
 
 <style scoped>
 .text-truncate {

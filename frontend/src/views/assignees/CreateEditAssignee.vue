@@ -62,13 +62,6 @@ const assignee = ref<Assignee>({
 });
 const isEditing = ref(false);
 
-onMounted(() => {
-    if (route.params.id) {
-        isEditing.value = true;
-        fetchAssignee();
-    }
-});
-
 /**
  * Fetches the assignee data from the server based on the route parameter ID.
  *
@@ -125,6 +118,13 @@ function submitForm() {
 function navigateBack() {
     router.push('/assignees');
 }
+
+onMounted(() => {
+    if (route.params.id) {
+        isEditing.value = true;
+        fetchAssignee();
+    }
+});
 </script>
 
 <style scoped>
