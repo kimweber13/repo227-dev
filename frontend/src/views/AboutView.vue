@@ -59,6 +59,8 @@ const router = useRouter();
 const currentDateTime = ref('');
 const activeTodoCount = ref(0);
 
+const readmeContent = ref('');
+
 /**
  * Updates the current date and time.
  *
@@ -96,7 +98,6 @@ function navigateToTodos() {
     router.push('/todos');
 }
 
-const readmeContent = ref('');
 
 onMounted(async () => {
     try {
