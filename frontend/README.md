@@ -39,21 +39,26 @@ Now the application is running and usualy available at `http://localhost:5173/` 
 
 You can navigate to the different parts of the application by clicking on the navigation bar at the top of the page.
 The application offers the possibility to create, edit and delete tasks and assignees, whereby each task can be assigned to an assignee.
-It is also possible to search for a specific task or assignee by id.
+It is also possible to search for a specific task or assignee by id or export a list of all todos.
+
+>General operations:
+- to start: you are starting in the dashboard, which offers some basic information. To get started click the blue "Get Started" button
+- to view dashboard or manual: click on the blue ToDo List icon in the top left corner.
 
 >Assignee operations:
-- to display all assignees: click on the "Assignees" tab
-- to create an assignee: click on the "Assignees" tab and then on the "Create Assignee" button, afterwards you can enter the data
-- to update an assignee: click on the "Assignees" tab and then on the "Edit" button of the assignee you want to update
-- to delete an assignee: click on the "Assignees" tab and then on the "Delete" button of the assignee you want to delete
-- to display a specific assignee: click on the "Assignee by ID" tab and then enter the ID of the assignee you want to display
+- to display all assignees: click on the "Assignees" tab.
+- to create an assignee: click on the "Assignees" tab and then on the "Create Assignee" button, afterwards you can enter the data.
+- to update an assignee: click on the "Assignees" tab and then on the "Edit" button of the assignee you want to update.
+- to delete an assignee: click on the "Assignees" tab and then on the "Delete" button of the assignee you want to delete.
+- to display a specific assignee: click on the "Assignees" tab and then on the "Search Assignee" button. Afterwards enter the ID of the assignee you want to display.
 
 >ToDo operations:
 - to display all todos: click on the "ToDos" tab
-- to create a todo: click on the "ToDos" tab and then on the "Create ToDo" button, afterwards you can enter the data
-- to update a todo: click on the "ToDos" tab and then on the "Edit" button of the todo you want to update
-- to delete a todo: click on the "ToDos" tab and then on the "Delete" button of the todo you want to delete
-- to display a specific todo: click on the "ToDo by ID" tab and then enter the ID of the todo you want to display
+- to create a todo: simply enter the data on the right half into the Create New ToDo card. Submit by clicking the "create ToDo" button.
+- to update a todo: click on the "ToDos" tab and then on the "Edit" button of the todo you want to update.
+- to delete a todo: click on the "ToDos" tab and then on the "Delete" button of the todo you want to delete.
+- to display a specific todo: click on the "ToDo" tab and then on the "Search ToDo" button. Afterwards enter the ID of the todo you want to display.
+- to export todos as list: click on the blue "Export ToDos" button in the App-bar. The download of the .csv file will start automatically.
 
 ### Disclaimer
 
