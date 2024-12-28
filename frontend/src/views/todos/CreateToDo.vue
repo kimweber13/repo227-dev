@@ -102,15 +102,6 @@ function fetchAssignees() {
 }
 
 /**
- * Lifecycle hook that is called when the component is mounted.
- *
- * This function calls `fetchAssignees` to load the list of assignees when the component is mounted.
- */
-onMounted(() => {
-    fetchAssignees();
-});
-
-/**
  * Submits the form data to create a new ToDo.
  *
  * This function constructs the ToDo object with the form data and sends a POST request to the server.
@@ -150,6 +141,10 @@ function submitFormCreate() {
 function navigateBack() {
     router.push('/todos');
 }
+
+onMounted(() => {
+    fetchAssignees();
+});
 </script>
 
 <style scoped>

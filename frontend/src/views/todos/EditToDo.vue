@@ -56,7 +56,6 @@
     </v-container>
 </template>
 
-
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -191,7 +190,6 @@ onMounted(() => {
     fetchAssignees();
     fetchToDoEdit();
 });
-
 </script>
 
 <style scoped>

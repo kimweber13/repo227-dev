@@ -141,7 +141,6 @@ function navigateToSearch() {
 
 
 onMounted(() => fetchAllAssignees());
-
 </script>
 
 <style scoped>

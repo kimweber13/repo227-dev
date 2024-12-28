@@ -187,7 +187,6 @@
     </v-container>
 </template>
 
-
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
@@ -277,7 +276,6 @@ function fetchAllToDos() {
         })
         .catch(error => showToast(new Toast("Error", "Failed to load todos: " + error.message, "error", faXmark)));
 }
-
 
 /**
  * Fetches all assignees from the server.
