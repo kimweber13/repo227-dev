@@ -117,7 +117,7 @@ function fetchAssignees() {
  * Sets the `dueDateInput` value if the ToDo item has a due date.
  * Displays an error toast if the fetch operation fails.
  */
-function fetchToDo() {
+function fetchToDoEdit() {
     if (route.params.id) {
         fetch(`${config.apiBaseUrl}/todos/${route.params.id}`)
             .then(response => response.json())
@@ -205,7 +205,7 @@ function navigateBack() {
 
 onMounted(() => {
     fetchAssignees();
-    fetchToDo();
+    fetchToDoEdit();
 });
 
 </script>

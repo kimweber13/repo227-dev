@@ -31,19 +31,19 @@
         </v-alert>
 
         <!-- Card to display the fetched ToDo details -->
-        <v-card v-if="todo" class="mb-4">
+        <v-card v-if="todoId" class="mb-4">
             <!-- Card title with a checkbox to mark the ToDo as finished -->
             <v-card-title>
-                <v-checkbox v-model="todo.finished" @change="updateToDoStatus(todo)" class="mr-2"></v-checkbox>
-                {{ todo.title }}
+                <v-checkbox v-model="todoId.finished" @change="updateToDoStatus(todoId)" class="mr-2"></v-checkbox>
+                {{ todoId.title }}
             </v-card-title>
             <!-- Card text with ToDo details -->
             <v-card-text>
-                <p class="text-truncate">{{ todo.description }}</p>
-                <p>ID: {{ todo.id }}</p>
-                <p>Due Date: {{ new Date(todo.dueDate).toLocaleDateString() }}</p>
-                <p>Assigned to: {{ getAssigneesForTodo(todo) }}</p>
-                <p>Category: {{ todo.category }}</p>
+                <p class="text-truncate">{{ todoId.description }}</p>
+                <p>ID: {{ todoId.id }}</p>
+                <p>Due Date: {{ new Date(todoId.dueDate).toLocaleDateString() }}</p>
+                <p>Assigned to: {{ getAssigneesForTodo(todoId) }}</p>
+                <p>Category: {{ todoId.category }}</p>
             </v-card-text>
             <!-- Card actions with edit and delete buttons -->
             <v-card-actions>
@@ -53,7 +53,7 @@
                     Edit
                 </v-btn>
                 <!-- Button to delete the ToDo -->
-                <v-btn @click="deleteToDo" color="error">
+                <v-btn @click="deleteToDoIdSearch" color="error">
                     <v-icon left>mdi-delete</v-icon>
                     Delete
                 </v-btn>
@@ -96,7 +96,7 @@ interface ToDo {
 
 const router = useRouter();
 const searchId = ref<number | null>(null);
-const todo = ref<ToDo | null>(null);
+const todoId = ref<ToDo | null>(null);
 const error = ref<string | null>(null);
 
 /**
@@ -122,13 +122,13 @@ function fetchToDo() {
             return response.json();
         })
         .then(data => {
-            todo.value = data;
+            todoId.value = data;
             error.value = null;
             showToast(new Toast("Success", "ToDo found successfully!", "success", faCheck));
         })
         .catch(err => {
             error.value = err.message;
-            todo.value = null;
+            todoId.value = null;
             showToast(new Toast("Error", `Failed to fetch todo: ${err.message}`, "error", faXmark));
         });
 }
@@ -141,13 +141,13 @@ function fetchToDo() {
  * On success, it shows a success toast notification and clears the `todo` ref.
  * On failure, it shows an error toast notification.
  */
-function deleteToDo() {
-    if (!todo.value) return;
+function deleteToDoIdSearch() {
+    if (!todoId.value) return;
 
-    fetch(`${config.apiBaseUrl}/todos/${todo.value.id}`, { method: "DELETE" })
+    fetch(`${config.apiBaseUrl}/todos/${todoId.value.id}`, { method: "DELETE" })
         .then(() => {
-            showToast(new Toast("Alert", `Successfully deleted ToDo with ID ${todo.value?.id}!`, "success", faCheck));
-            todo.value = null;
+            showToast(new Toast("Alert", `Successfully deleted ToDo with ID ${todoId.value?.id}!`, "success", faCheck));
+            todoId.value = null;
         })
         .catch(error => showToast(new Toast("Error", error.message, "error", faXmark)));
 }
@@ -158,8 +158,8 @@ function deleteToDo() {
  * This function uses the router to navigate to the edit page for the ToDo with the current ID.
  */
 function editToDo() {
-    if (todo.value) {
-        router.push(`/todos/${todo.value.id}/edit`);
+    if (todoId.value) {
+        router.push(`/todos/${todoId.value.id}/edit`);
     }
 }
 
