@@ -1,58 +1,3 @@
-<script setup lang="ts">
-import { RouterView } from 'vue-router';
-import { ref, computed } from 'vue';
-import { activeToasts } from '@/ts/toasts';
-import { saveAs } from 'file-saver';
-import config from "@/config";
-import { mdiCheckCircle, mdiAlertCircle, mdiHome } from '@mdi/js';
-
-const isExporting = ref(false);
-const exportStatus = ref('');
-const snackbarIcon = ref('');
-
-const showSnackbar = computed({
-    get: () => !!exportStatus.value,
-    set: (value) => {
-        if (!value) exportStatus.value = '';
-    }
-});
-
-/**
- * Exports the ToDos to a CSV file.
- *
- * This function triggers the export process, updates the export status,
- * and handles the response to save the CSV file. It also manages the
- * snackbar notifications for success or failure.
- */
-function exportToCsv() {
-    isExporting.value = true;
-    exportStatus.value = 'Exporting...';
-    fetch(`${config.apiBaseUrl}/csv-downloads/todos`, {
-        method: 'GET',
-        headers: {
-            'Accept': 'text/csv'
-        }
-    })
-        .then(response => response.blob())
-        .then(blob => {
-            saveAs(blob, "todos_export.csv");
-            exportStatus.value = 'Export successful!';
-            snackbarIcon.value = mdiCheckCircle;
-        })
-        .catch(error => {
-            console.error('Export failed:', error);
-            exportStatus.value = 'Export failed. Please try again.';
-            snackbarIcon.value = mdiAlertCircle;
-        })
-        .finally(() => {
-            isExporting.value = false;
-            setTimeout(() => {
-                exportStatus.value = '';
-            }, 3000);
-        });
-}
-</script>
-
 <template>
     <!-- Main application container -->
     <v-app>
@@ -128,6 +73,61 @@ function exportToCsv() {
         </div>
     </v-app>
 </template>
+
+<script setup lang="ts">
+import { RouterView } from 'vue-router';
+import { ref, computed } from 'vue';
+import { activeToasts } from '@/ts/toasts';
+import { saveAs } from 'file-saver';
+import config from "@/config";
+import { mdiCheckCircle, mdiAlertCircle, mdiHome } from '@mdi/js';
+
+const isExporting = ref(false);
+const exportStatus = ref('');
+const snackbarIcon = ref('');
+
+const showSnackbar = computed({
+    get: () => !!exportStatus.value,
+    set: (value) => {
+        if (!value) exportStatus.value = '';
+    }
+});
+
+/**
+ * Exports the ToDos to a CSV file.
+ *
+ * This function triggers the export process, updates the export status,
+ * and handles the response to save the CSV file. It also manages the
+ * snackbar notifications for success or failure.
+ */
+function exportToCsv() {
+    isExporting.value = true;
+    exportStatus.value = 'Exporting...';
+    fetch(`${config.apiBaseUrl}/csv-downloads/todos`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'text/csv'
+        }
+    })
+        .then(response => response.blob())
+        .then(blob => {
+            saveAs(blob, "todos_export.csv");
+            exportStatus.value = 'Export successful!';
+            snackbarIcon.value = mdiCheckCircle;
+        })
+        .catch(error => {
+            console.error('Export failed:', error);
+            exportStatus.value = 'Export failed. Please try again.';
+            snackbarIcon.value = mdiAlertCircle;
+        })
+        .finally(() => {
+            isExporting.value = false;
+            setTimeout(() => {
+                exportStatus.value = '';
+            }, 3000);
+        });
+}
+</script>
 
 <style scoped>
 .text-truncate {
