@@ -142,22 +142,6 @@ function fetchToDoEdit() {
 }
 
 /**
- * Toggles the inclusion of an assignee in the ToDo item's assignee list.
- * If the assignee is not in the list, they are added.
- * If the assignee is already in the list, they are removed.
- *
- * @param assigneeId - The ID of the assignee to toggle.
- */
-function toggleAssignee(assigneeId: number) {
-    const index = todo.value.assigneeIdList.indexOf(assigneeId);
-    if (index === -1) {
-        todo.value.assigneeIdList.push(assigneeId);
-    } else {
-        todo.value.assigneeIdList.splice(index, 1);
-    }
-}
-
-/**
  * Submits the form to update an existing ToDo item.
  * Constructs the ToDo object with the current form values and due date timestamp.
  * Sends a PUT request to the server with the ToDo data.
