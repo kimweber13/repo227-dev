@@ -7,18 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 
 /**
  * REST Controller for managing ToDo entities.
@@ -99,55 +88,15 @@ public class ToDoController {
      * Exports all ToDos to a CSV file.
      *
      * This method sets the response content type and header for CSV download,
-     * retrieves all ToDos, formats the data, and writes it to the response output stream.
+     * and delegates the actual export logic to the ToDoService.
      *
      * @param response The HttpServletResponse to write the CSV data to
-     * @throws IOException if an I/O error occurs
+     * @return ResponseEntity with an HTTP status of OK
      */
     @GetMapping(value = "/csv-downloads/todos", produces = "text/csv;charset=UTF-8")
-    public void exportToCsv(HttpServletResponse response) throws IOException {
-        response.setContentType("text/csv;charset=UTF-8");
-        response.setHeader("Content-Disposition", "attachment; filename=\"todos.csv\"");
-
-        List<ToDo> todos = toDoService.getAllToDos();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-        try (OutputStreamWriter writer = new OutputStreamWriter(response.getOutputStream(), StandardCharsets.UTF_8);
-             CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader("id", "title", "description", "finished", "assignees", "createdDate", "dueDate", "finishedDate", "category"))) {
-
-            for (ToDo todo : todos) {
-                csvPrinter.printRecord(
-                    todo.getId(),
-                    todo.getTitle(),
-                    todo.getDescription(),
-                    todo.isFinished() ? "TRUE" : "FALSE",
-                    String.join("+", todo.getAssigneeList().stream()
-                        .map(assignee -> assignee.getPrename() + " " + assignee.getName())
-                        .collect(Collectors.toList())),
-                    formatDate(todo.getCreatedDate(), formatter),
-                    formatDate(todo.getDueDate(), formatter),
-                    formatDate(todo.getFinishedDate(), formatter),
-                    todo.getCategory()
-                );
-            }
-        }
-    }
-
-
-
-
-    /**
-     * Formats a timestamp into a date string using the specified formatter.
-     *
-     * @param timestamp The timestamp to format, in milliseconds since epoch
-     * @param formatter The DateTimeFormatter to use for formatting the date
-     * @return The formatted date string, or an empty string if the timestamp is null
-     */
-    private String formatDate(Long timestamp, DateTimeFormatter formatter) {
-        if (timestamp == null) {
-            return "";
-        }
-        return LocalDate.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault()).format(formatter);
+    public ResponseEntity<Void> exportToCsv (HttpServletResponse response){
+        toDoService.exportToCsv(response);
+        return ResponseEntity.ok().build();
     }
 
     /**

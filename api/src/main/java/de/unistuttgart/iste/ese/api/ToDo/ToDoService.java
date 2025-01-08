@@ -2,14 +2,24 @@ package de.unistuttgart.iste.ese.api.ToDo;
 
 import de.unistuttgart.iste.ese.api.Assignee.AssigneeService;
 import de.unistuttgart.iste.ese.api.Assignee.Assignee;
-import de.unistuttgart.iste.ese.api.TodoModel;
+import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Service class for managing ToDo-related operations.
@@ -167,5 +177,62 @@ public class ToDoService {
             todo.getAssigneeList().removeIf(assignee -> assignee.getId().equals(assigneeId));
             toDoRepository.save(todo);
         }
+    }
+
+    /**
+     * Exports all ToDos to a CSV file.
+     *
+     * This method sets the response content type and header for CSV file download.
+     * It retrieves all ToDos, formats the data, and writes it to the response output stream in CSV format.
+     * If an IOException occurs during the process, it throws a RuntimeException.
+     *
+     * @param response The HttpServletResponse to write the CSV data to
+     */
+    public void exportToCsv(HttpServletResponse response) {
+        response.setContentType("text/csv;charset=UTF-8");
+        response.setHeader("Content-Disposition", "attachment; filename=\"todos.csv\"");
+
+        List<ToDo> todos = getAllToDos();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        try (OutputStreamWriter writer = new OutputStreamWriter(response.getOutputStream(), StandardCharsets.UTF_8);
+             CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader("id", "title", "description", "finished", "assignees", "createdDate", "dueDate", "finishedDate", "category"))) {
+
+            for (ToDo todo : todos) {
+                csvPrinter.printRecord(
+                    todo.getId(),
+                    todo.getTitle(),
+                    todo.getDescription(),
+                    todo.isFinished() ? "TRUE" : "FALSE",
+                    String.join("+", todo.getAssigneeList().stream()
+                        .map(assignee -> assignee.getPrename() + " " + assignee.getName())
+                        .collect(Collectors.toList())),
+                    formatDate(todo.getCreatedDate(), formatter),
+                    formatDate(todo.getDueDate(), formatter),
+                    formatDate(todo.getFinishedDate(), formatter),
+                    todo.getCategory()
+                );
+            }
+        } catch (IOException e) {
+            // Handle the exception appropriately, e.g., log it or throw a custom exception
+            throw new RuntimeException("Error exporting ToDos to CSV", e);
+        }
+    }
+
+    /**
+     * Formats a timestamp into a date string.
+     *
+     * This method converts a given timestamp (in milliseconds) to a formatted date string
+     * using the provided DateTimeFormatter. If the timestamp is null, it returns an empty string.
+     *
+     * @param timestamp The timestamp in milliseconds to format
+     * @param formatter The DateTimeFormatter to use for formatting the date
+     * @return The formatted date string, or an empty string if the timestamp is null
+     */
+    private String formatDate(Long timestamp, DateTimeFormatter formatter) {
+        if (timestamp == null) {
+            return "";
+        }
+        return LocalDate.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault()).format(formatter);
     }
 }
