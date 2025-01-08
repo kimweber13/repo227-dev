@@ -92,6 +92,23 @@ function submitForm() {
         : `${config.apiBaseUrl}/assignees`;
     const method = isEditing.value ? 'PUT' : 'POST';
 
+    if (!assignee.value.prename.trim()) {
+        showToast(new Toast('Error', 'First Name is required', 'error', faXmark));
+        return;
+    }
+    if (!assignee.value.name.trim()) {
+        showToast(new Toast('Error', 'Last Name is required', 'error', faXmark));
+        return;
+    }
+    if (!assignee.value.email.trim()) {
+        showToast(new Toast('Error', 'Email is required', 'error', faXmark));
+        return;
+    }
+    if (!assignee.value.email.endsWith('@uni-stuttgart.de')) {
+        showToast(new Toast('Error', 'Email must end with @uni-stuttgart.de', 'error', faXmark));
+        return;
+    }
+
     fetch(url, {
         method: method,
         headers: { 'Content-Type': 'application/json' },
@@ -99,7 +116,9 @@ function submitForm() {
     })
         .then(response => {
             if (!response.ok) {
-                throw new Error(`Failed to ${isEditing.value ? 'update' : 'create'} assignee`);
+                return response.json().then(errorData => {
+                    throw new Error(errorData.message || `Failed to ${isEditing.value ? 'update' : 'create'} assignee`);
+                });
             }
             return response.json();
         })
@@ -107,8 +126,16 @@ function submitForm() {
             showToast(new Toast('Success', `Assignee ${isEditing.value ? 'updated' : 'created'} successfully!`, 'success', faCheck));
             router.push('/assignees');
         })
-        .catch(error => showToast(new Toast('Error', error.message, 'error', faXmark)));
+        .catch(error => {
+            let errorMessage = error.message;
+            if (errorMessage.includes('email')) {
+                errorMessage = 'Invalid email format or email already exists';
+            }
+            showToast(new Toast('Error', errorMessage, 'error', faXmark));
+        });
 }
+
+
 
 /**
  * Navigates back to the assignees list.
