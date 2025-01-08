@@ -159,6 +159,15 @@ function submitFormEdit() {
         dueDate: inputDate.getTime() + offset
     };
 
+    if (!todo.value.title.trim()) {
+        showToast(new Toast('Error', 'Title is required', 'error', faXmark));
+        return;
+    }
+    if (todo.value.title.length > 100) {
+        showToast(new Toast('Error', 'Title must not exceed 100 characters', 'error', faXmark));
+        return;
+    }
+
     fetch(`${config.apiBaseUrl}/todos/${route.params.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -166,7 +175,9 @@ function submitFormEdit() {
     })
         .then(response => {
             if (!response.ok) {
-                throw new Error(`Failed to update todo: ${response.statusText}`);
+                return response.json().then(errorData => {
+                    throw new Error(errorData.message || `Failed to update todo: ${response.statusText}`);
+                });
             }
             return response.json();
         })
@@ -174,8 +185,15 @@ function submitFormEdit() {
             showToast(new Toast('Success', 'ToDo updated successfully!', 'success', faCheck));
             router.push('/todos');
         })
-        .catch(error => showToast(new Toast('Error', error.message, 'error', faXmark)));
+        .catch(error => {
+            let errorMessage = error.message;
+            if (errorMessage.includes('title')) {
+                errorMessage = 'Invalid title format or title is missing';
+            }
+            showToast(new Toast('Error', errorMessage, 'error', faXmark));
+        });
 }
+
 
 /**
  * Navigates back to the ToDo list.

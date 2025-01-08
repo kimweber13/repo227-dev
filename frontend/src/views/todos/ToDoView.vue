@@ -114,7 +114,6 @@
                                     v-model="dueDateInput"
                                     label="Due Date"
                                     type="datetime-local"
-                                    required
                                 ></v-text-field>
                                 <!-- Card for selecting assignees -->
                                 <v-card class="mb-4">
@@ -161,7 +160,7 @@
                                 <v-card-text>
                                     <p>ID: {{ todo.id }}</p>
                                     <p class="text-truncate">{{ todo.description }}</p>
-                                    <p>Completed Date: {{ new Date(todo.completedDate as string).toLocaleDateString() }}</p>
+                                    <p>Finished Date: {{ new Date(todo.finishedDate as string).toLocaleDateString() }}</p>
                                     <p>Assigned to: {{ getAssigneesForTodo(todo) }}</p>
                                     <p>Category: {{ todo.category }}</p>
                                 </v-card-text>
@@ -206,8 +205,8 @@ interface ToDo {
     description: string;
     finished: boolean;
     createdDate?: string;
-    dueDate?: string;
-    completedDate: string | null | undefined;
+    dueDate?: string | null;
+    finishedDate: string | null | undefined;
     assigneeList: Assignee[];
     assigneeIdList: number[];
     category: string;
@@ -224,7 +223,7 @@ const newTodo = ref({
     title: '',
     description: '',
     assigneeIdList: [] as number[],
-    dueDate: 0,
+    dueDate: null,
     category: ''
 });
 const dueDateInput = ref('');
@@ -246,14 +245,12 @@ const filteredAndSortedTodos = computed(() => {
 
 const activeTodos = computed(() => filteredAndSortedTodos.value.filter(todo => !todo.finished));
 const completedTodos = computed(() => filteredAndSortedTodos.value.filter(todo => todo.finished));
-
-const assigneeItems = computed(() => {
+computed(() => {
     return assignees.value.map(assignee => ({
         id: assignee.id,
         name: `${assignee.prename} ${assignee.name}`
     }));
 });
-
 const createTodoPanel = ref([0]);
 
 /**
@@ -302,7 +299,7 @@ function fetchAssignees() {
  * Updates the status of the given ToDo.
  *
  * This function sends a PUT request to the server to update the status of the ToDo.
- * On success, it updates the `completedDate` of the ToDo.
+ * On success, it updates the `finishedDate` of the ToDo.
  * On failure, it shows an error toast notification.
  *
  * @param {ToDo} todo - The ToDo object to update.
@@ -313,7 +310,8 @@ async function updateToDoStatus(todo: ToDo) {
         title: todo.title,
         description: todo.description,
         finished: todo.finished,
-        completedDate: !todo.finished ? new Date().toISOString() : null,
+        finishedDate: !todo.finished ? null : new Date().toISOString(),
+        noFinishedDate: null,
         assigneeIdList: todo.assigneeList.map(assignee => assignee.id),
         assigneeList: todo.assigneeList,
         dueDate: todo.dueDate,
@@ -323,15 +321,21 @@ async function updateToDoStatus(todo: ToDo) {
     try {
         const response = await fetch(`${config.apiBaseUrl}/todos/${todo.id}`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(updateData),
         });
+
         if (!response.ok) {
             throw new Error('Failed to update todo status');
         }
-        todo.completedDate = updateData.completedDate;
+
+        if (updateData.finished){
+            todo.finishedDate = updateData.finishedDate;
+        }
+        if (!updateData.finished){
+            todo.finishedDate = updateData.noFinishedDate;
+        }
+
         showToast(new Toast("Success", `ToDo status successfully ${todo.finished ? 'completed' : 'reactivated'}!`, "success", faCheck));
     } catch (error) {
         showToast(new Toast("Error", "Failed to update todo status", "error", faXmark));
@@ -429,9 +433,20 @@ function toggleSort(field: 'title' | 'dueDate') {
  * On failure, it shows an error toast notification.
  */
 function submitForm() {
+    const titleMaxLength = 100;
+
+    if (!newTodo.value.title.trim()) {
+        showToast(new Toast('Error', 'Title is required', 'error', faXmark));
+        return;
+    }
+    if (newTodo.value.title.length > titleMaxLength) {
+        showToast(new Toast('Error', `Title exceeds maximum length of ${titleMaxLength} characters`, 'error', faXmark));
+        return;
+    }
+
     const todoToSubmit = {
         ...newTodo.value,
-        dueDate: new Date(dueDateInput.value).getTime(),
+        dueDate: dueDateInput.value ? new Date(dueDateInput.value).getTime() : null,
         finished: false
     };
 
@@ -442,18 +457,29 @@ function submitForm() {
     })
         .then(response => {
             if (!response.ok) {
-                throw new Error('Failed to create todo');
+                return response.json().then(errorData => {
+                    throw new Error(errorData.message || 'Failed to create todo');
+                });
             }
             return response.json();
         })
         .then(data => {
             todos.value.push(data);
             showToast(new Toast('Success', 'ToDo created successfully!', 'success', faCheck));
-            newTodo.value = { title: '', description: '', assigneeIdList: [], dueDate: 0, category: '' };
+            newTodo.value = { title: '', description: '', assigneeIdList: [], dueDate: null, category: '' };
             dueDateInput.value = '';
         })
-        .catch(error => showToast(new Toast('Error', error.message, 'error', faXmark)));
+        .catch(error => {
+            let errorMessage = error.message;
+            if (errorMessage.includes('title')) {
+                errorMessage = 'Invalid title format or title is missing';
+            }
+            showToast(new Toast('Error', errorMessage, 'error', faXmark));
+        });
 }
+
+
+
 
 onMounted(async () => {
     await fetchAssignees();
