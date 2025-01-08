@@ -51,7 +51,6 @@ public class ToDoService {
             String category = todoModel.predictClass(dto.getTitle());
             todo.setCategory(category);
         } catch (Exception e) {
-            // Setzen Sie einen Standardwert, wenn die Kategorisierung fehlschlägt
             todo.setCategory("work");
         }
         return toDoRepository.save(todo);
@@ -76,7 +75,6 @@ public class ToDoService {
             String category = todoModel.predictClass(dto.getTitle());
             todo.setCategory(category);
         } catch (Exception e) {
-            // Behalte die existierende Kategorie bei, wenn die Vorhersage fehlschlägt
             if (todo.getCategory() == null) {
                 todo.setCategory("work");
             }
@@ -214,7 +212,6 @@ public class ToDoService {
                 );
             }
         } catch (IOException e) {
-            // Handle the exception appropriately, e.g., log it or throw a custom exception
             throw new RuntimeException("Error exporting ToDos to CSV", e);
         }
     }
