@@ -17,7 +17,6 @@ public class ToDoDTO {
 
     private boolean finished;
 
-    @NotNull(message = "Due date is required")
     private Long dueDate;
 
     @NotNull(message = "Assignee list is required")

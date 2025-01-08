@@ -28,10 +28,8 @@ public class ToDo {
     @ManyToMany
     private List<Assignee> assigneeList = new ArrayList<>();
 
-    @NotNull
     private Long createdDate;
 
-    @NotNull
     private Long dueDate;
 
     private Long finishedDate;
