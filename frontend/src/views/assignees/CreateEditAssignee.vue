@@ -135,8 +135,6 @@ function submitForm() {
         });
 }
 
-
-
 /**
  * Navigates back to the assignees list.
  *

@@ -27,6 +27,7 @@ To get more information about the structure and the functionality of the fronten
 - ToDo title: 1-100 characters, not empty
 - Assignee first name and last name: 1-40 characters, not empty
 - Assignee email: Must end with "uni-stuttgart.de"
+- There are methods which are not used but still are necessary for a error free application
 - When running the test suite provided by the University Stuttgart, there is a specific scenario, where its not 100% successful.
   This occurs when starting the backend, then running the test suite, then restarting the backend and then again running the test suite.
   The result shows that only 1 suite has passed but every test (26/26) has passed. If you run the test suite again its 100% successful again.

@@ -165,19 +165,6 @@ public class ToDoService {
     }
 
     /**
-     * Removes an Assignee from all associated ToDos.
-     *
-     * @param assigneeId The ID of the Assignee to remove
-     */
-    public void removeAssigneeFromAllTodos(Long assigneeId) {
-        List<ToDo> todosWithAssignee = getToDosByAssigneeId(assigneeId);
-        for (ToDo todo : todosWithAssignee) {
-            todo.getAssigneeList().removeIf(assignee -> assignee.getId().equals(assigneeId));
-            toDoRepository.save(todo);
-        }
-    }
-
-    /**
      * Exports all ToDos to a CSV file.
      *
      * This method sets the response content type and header for CSV file download.

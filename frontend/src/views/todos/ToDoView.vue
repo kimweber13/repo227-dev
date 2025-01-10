@@ -478,9 +478,6 @@ function submitForm() {
         });
 }
 
-
-
-
 onMounted(async () => {
     await fetchAssignees();
     fetchAllToDos();

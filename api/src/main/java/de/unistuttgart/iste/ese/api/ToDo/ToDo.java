@@ -182,10 +182,11 @@ public class ToDo {
      *
      * @param finishedDate The finished date to set
      */
-    public void setFinishedDate(Long finishedDate) { if (this.finished) {
-        this.finishedDate = finishedDate;
-    } }
-
+    public void setFinishedDate(Long finishedDate) {
+        if (this.finished) {
+            this.finishedDate = finishedDate;
+        }
+    }
 
     /**
      * Gets the category of the ToDo.
